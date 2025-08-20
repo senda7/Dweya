@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Profil Utilisateur - Dwaya</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-gradient-start: #74ebd5;
+            --bg-gradient-end: #ACB6E5;
+            --container-bg: #ffffff;
+            --primary-color: #1e6b77;
+            --btn-bg: #74ebd5;
+            --btn-hover: #5fc9bb;
+            --text-color: #333;
+            --turquoise: #74ebd5;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            min-height: 100vh;
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            width: 110px;
+            height: 110px;
+            margin-bottom: 10px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .nav-links a {
+            margin: 0 12px;
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--btn-hover);
+        }
+
+        .logout-btn {
+            background-color: transparent;
+            border: 2px solid var(--btn-bg);
+            color: var(--btn-bg);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: var(--btn-bg);
+            color: white;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            background-color: var(--container-bg);
+        }
+
+        .profile-img {
+            width: 160px;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .info-title {
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .info-text {
+            font-size: 16px;
+            color: var(--text-color);
+        }
+
+        .settings-link {
+            color: var(--turquoise);
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .settings-link:hover {
+            text-decoration: underline;
+            color: var(--btn-hover);
+        }
+
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #parametres {
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        #parametres button {
+            background-color: transparent !important;
+            color: var(--turquoise) !important;
+            border-color: var(--turquoise) !important;
+            font-weight: 750;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        #parametres button:hover {
+            background-color: var(--turquoise) !important;
+            color: white !important;
+        }
+
+        .parametres-section {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .parametres-section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<nav>
+    <div class="logo-container">
+        <img th:src="@{/logo.png}" alt="Logo Dwaya" class="logo">
+    </div>
+    <div class="nav-links">
+        <a th:href="@{/accueil-utilisateur}">Accueil</a>
+        <a th:href="@{/medicament}">Médicaments</a>
+        <a th:href="@{/rappels}">Rappels</a>
+        <a th:href="@{/dons}">Dons</a>
+        <a th:href="@{/pharmacies}">Pharmacies</a>
+        <a th:href="@{/profil-utilisateur}">Profil</a>
+    </div>
+    <form th:action="@{/logout}" method="post">
+        <button type="submit" class="logout-btn">Déconnexion</button>
+    </form>
+</nav>
+
+<!-- Profil -->
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+
+            <div class="card p-4">
+
+                <div class="row">
+                    <!-- Colonne Gauche -->
+                    <div class="col-md-4 text-center left-column">
+                        <!--  Affiche la photo actuelle -->
+                        <div class="text-center mb-3">
+                            <img th:src="@{'/utilisateur/photo/' + ${utilisateur.id}}"
+                                 alt="Photo actuelle"
+                                 class="profile-img">
+                        </div>
+
+                        <a class="settings-link mt-2" onclick="toggleParametres()">
+                            <i class="fas fa-cog me-1"></i> Paramètres du compte
+                        </a>
+                        <div id="parametres" class="parametres-section">
+                            <button class="btn btn-outline-primary w-100 mb-2" onclick="showInfo()">
+                                <i class="fas fa-user me-2"></i>Mes informations
+                            </button>
+                            <button class="btn btn-outline-primary w-100 mb-2" onclick="showEdit()">
+                                <i class="fas fa-edit me-2"></i>Modifier les informations
+                            </button>
+                            <button class="btn btn-outline-primary w-100 mb-2" onclick="showPhotoSection()">
+                                <i class="fas fa-image me-2"></i>Changer la photo de profil
+                            </button>
+                            <button class="btn btn-outline-primary w-100 mb-2" onclick="confirmerSuppression()">
+                                <i class="fas fa-trash-alt me-2"></i>supprimer la photo de profil
+                            </button>
+                            <button class="btn btn-outline-primary w-100 mb-2" onclick="showPasswordForm()">
+                                <i class="fas fa-key me-2"></i>Changer le mot de passe
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Colonne Droite -->
+                    <div class="col-md-8">
+
+
+                        <!-- Zone affichage infos -->
+                        <div id="info-section">
+                            <h4 class="mb-3" style="color: var(--turquoise); font-weight: bold;">Mes informations personnelles</h4>
+                            <div class="row mb-2">
+                                <div class="col-sm-5 info-title">Nom :</div>
+                                <div class="col-sm-7 info-text" th:text="${utilisateur.nom}"></div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5 info-title">Prénom :</div>
+                                <div class="col-sm-7 info-text" th:text="${utilisateur.prenom}"></div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5 info-title">Genre :</div>
+                                <div class="col-sm-7 info-text" th:text="${utilisateur.genre}"></div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5 info-title">Date de naissance :</div>
+                                <div class="col-sm-7 info-text" th:text="${utilisateur.dateNaissance}"></div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5 info-title">Email :</div>
+                                <div class="col-sm-7 info-text" th:text="${utilisateur.email}"></div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5 info-title">Téléphone :</div>
+                                <div class="col-sm-7 info-text" th:text="${utilisateur.telephone}"></div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5 info-title">Adresse :</div>
+                                <div class="col-sm-7 info-text" th:text="${utilisateur.adresse}"></div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5 info-title">Ville :</div>
+                                <div class="col-sm-7 info-text" th:text="${utilisateur.ville}"></div>
+                            </div>
+                        </div>
+
+                        <!-- Zone modification infos -->
+                        <div id="edit-section" style="display: none;">
+                            <h4 class="mb-3" style="color: var(--turquoise); font-weight: bold;">Modifier mes informations</h4>
+                            <form th:action="@{/utilisateur/modifier}" method="post">
+                                <input type="hidden" name="id" th:value="${utilisateur.id}">
+                                <div class="mb-2"><input type="text" class="form-control" name="nom" placeholder="Nom" th:value="${utilisateur.nom}"></div>
+                                <div class="mb-2"><input type="text" class="form-control" name="prenom" placeholder="Prénom" th:value="${utilisateur.prenom}"></div>
+                                <div class="mb-2">
+                                    <select class="form-select" id="genre" name="genre" required>
+                                        <option value="Homme" th:selected="${utilisateur.genre == 'Homme'}">Homme</option>
+                                        <option value="Femme" th:selected="${utilisateur.genre == 'Femme'}">Femme</option>
+                                        <option value="Autre" th:selected="${utilisateur.genre == 'Autre'}">Autre</option>
+                                    </select>
+                                </div>
+                                <div class="mb-2"><input type="date" class="form-control" name="dateNaissance" th:value="${utilisateur.dateNaissance}"></div>
+                                <div class="mb-2"><input type="email" class="form-control" name="email" placeholder="Email" th:value="${utilisateur.email}"></div>
+                                <div class="mb-2"><input type="text" class="form-control" name="telephone" placeholder="Téléphone" th:value="${utilisateur.telephone}"></div>
+                                <div class="mb-2"><input type="text" class="form-control" name="adresse" placeholder="Adresse" th:value="${utilisateur.adresse}"></div>
+                                <div class="mb-2"><input type="text" class="form-control" name="ville" placeholder="Ville" th:value="${utilisateur.ville}"></div>
+                                <div class="d-flex justify-content-end">
+                                    <button type="reset" class="btn btn-light me-2" onclick="showInfo()" style="background-color: #f8f9fa; color: #333;">Réinitialiser</button>
+                                    <button type="submit" class="btn btn-light" style="background-color: #f8f9fa; color: #333;">Envoyer</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Zone changement photo -->
+                        <div id="photo-section" style="display: none;">
+                            <h4 class="mb-3" style="color: var(--turquoise); font-weight: bold;">
+                                Changer la photo de profil
+                            </h4>
+
+                            <!-- Formulaire pour uploader la nouvelle photo -->
+                            <form th:action="@{/utilisateur/changer-photo}" method="post" enctype="multipart/form-data">
+                                <input type="hidden" name="id" th:value="${utilisateur.id}">
+                                <div class="mb-3">
+                                    <input type="file" name="photoProfil" accept="image/*" required class="form-control" />
+                                </div>
+
+
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-light me-2" onclick="showInfo()" style="background-color: #f8f9fa; color: #333;">Réinitialiser</button>
+                                    <button type="submit" class="btn btn-light" style="background-color: #f8f9fa; color: #333;">Envoyer</button>
+                                </div>
+                            </form>
+                        </div>
+
+
+                        <!-- Zone changement mot de passe -->
+                        <div id="password-section" style="display: none;">
+                            <h4 class="mb-3" style="color: var(--turquoise); font-weight: bold;">Changer le mot de passe</h4>
+                            <form id="passwordForm" th:action="@{/utilisateur/changer-mot-de-passe}" method="post" novalidate>
+                                <div class="mb-3">
+                                    <label class="form-label">Ancien mot de passe *</label>
+                                    <input type="password" class="form-control" name="ancienMotDePasse" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Nouveau mot de passe *</label>
+                                    <input type="password" class="form-control" name="nouveauMotDePasse" required>
+                                    <small class="text-muted">Au moins 8 caractères, avec lettres, chiffres et symbole.</small>
+                                    <div class="invalid-feedback">Le mot de passe doit contenir 8 caractères minimum, une lettre, un chiffre et un symbole.</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Confirmation du nouveau mot de passe *</label>
+                                    <input type="password" class="form-control" name="confirmationMotDePasse" required>
+                                    <div class="invalid-feedback">Les mots de passe ne correspondent pas.</div>
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    <button type="reset" class="btn btn-light me-2" onclick="showInfo()" style="background-color: #f8f9fa; color: #333;">Réinitialiser</button>
+                                    <button type="submit" class="btn btn-light" style="background-color: #f8f9fa; color: #333;">Envoyer</button>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script>
+    function toggleParametres() {
+        document.getElementById('parametres').classList.toggle('active');
+    }
+
+    function showEdit() {
+        document.getElementById('info-section').style.display = 'none';
+        document.getElementById('edit-section').style.display = 'block';
+        document.getElementById('password-section').style.display = 'none';
+        document.getElementById('photo-section').style.display = 'none';
+    }
+
+    function showInfo() {
+        document.getElementById('info-section').style.display = 'block';
+        document.getElementById('edit-section').style.display = 'none';
+        document.getElementById('password-section').style.display = 'none';
+        document.getElementById('photo-section').style.display = 'none';
+    }
+
+    function showPasswordForm() {
+        document.getElementById('info-section').style.display = 'none';
+        document.getElementById('edit-section').style.display = 'none';
+        document.getElementById('password-section').style.display = 'block';
+        document.getElementById('photo-section').style.display = 'none';
+    }
+
+    function showPhotoSection() {
+        document.getElementById('info-section').style.display = 'none';
+        document.getElementById('edit-section').style.display = 'none';
+        document.getElementById('password-section').style.display = 'none';
+        document.getElementById('photo-section').style.display = 'block';
+    }
+
+    // Validation mot de passe
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("passwordForm");
+        if (!form) return;
+        const newPass = form.querySelector("input[name='nouveauMotDePasse']");
+        const confirmPass = form.querySelector("input[name='confirmationMotDePasse']");
+
+        form.addEventListener("submit", function (e) {
+            let isValid = true;
+            const strongPassword = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-={}\[\]|\\:;"'<>,.?/~`]).{8,}$/;
+
+            if (!strongPassword.test(newPass.value)) {
+                newPass.classList.add("is-invalid");
+                isValid = false;
+            } else {
+                newPass.classList.remove("is-invalid");
+            }
+
+            if (confirmPass.value !== newPass.value || confirmPass.value === "") {
+                confirmPass.classList.add("is-invalid");
+                isValid = false;
+            } else {
+                confirmPass.classList.remove("is-invalid");
+            }
+
+            if (!isValid) e.preventDefault();
+        });
+
+        [newPass, confirmPass].forEach(input => {
+            input.addEventListener("input", () => {
+                input.classList.remove("is-invalid");
+            });
+        });
+    });
+</script>
+</body>
+</html>

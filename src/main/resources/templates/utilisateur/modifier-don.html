@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modifier un Don | Dwaya</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/a2e0e6fa41.js" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg-gradient-start: #74ebd5;
+      --bg-gradient-end: #ACB6E5;
+      --container-bg: #ffffff;
+      --primary-color: #1e6b77;
+      --btn-bg: #74ebd5;
+      --btn-hover: #5fc9bb;
+      --text-color: #333;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+      min-height: 100vh;
+    }
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background-color: #fff;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 40px;
+    }
+    .logo-container { display: flex; align-items: center; }
+    .logo { width: 110px; height: 110px; margin-bottom: 10px; animation: float 3s ease-in-out infinite; }
+    @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);} }
+    .nav-links a { margin: 0 12px; text-decoration: none; color: var(--text-color); font-weight: 500; transition: color 0.3s; }
+    .nav-links a:hover { color: var(--btn-hover); }
+    .logout-btn {
+      background-color: transparent;
+      border: 2px solid var(--btn-bg);
+      color: var(--btn-bg);
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .logout-btn:hover { background-color: var(--btn-bg); color: white; }
+    .container {
+      background-color: var(--container-bg);
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      width: 100%;
+      max-width: 700px;
+      margin: 30px auto;
+    }
+    .section-title { color: var(--primary-color); font-weight: bold; margin-bottom: 30px; text-align: center; }
+    .btn-custom { background-color: var(--btn-bg); color: white; border: none; transition: background-color 0.3s ease; }
+    .btn-custom:hover { background-color: var(--btn-hover); }
+    .current-img { margin-bottom: 15px; width: 200px; height: 150px; object-fit: cover; border-radius: 10px; border: 1px solid #ddd; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo-container">
+    <img th:src="@{/logo.png}" alt="Logo Dwaya" class="logo">
+  </div>
+
+  <div class="nav-links">
+    <a th:href="@{/accueil-utilisateur}">Accueil</a>
+    <a th:href="@{/medicament}">Médicaments</a>
+    <a th:href="@{/rappels}">Rappels</a>
+    <a th:href="@{/dons}">Dons</a>
+    <a th:href="@{/pharmacies}">Pharmacies</a>
+    <a th:href="@{/profil-utilisateur}">Profil</a>
+  </div>
+
+  <form th:action="@{/logout}" method="post">
+    <button type="submit" class="logout-btn">Déconnexion</button>
+  </form>
+</nav>
+
+<div class="container">
+  <h2 class="section-title">Modifier le Don</h2>
+
+  <form th:action="@{/dons/modifier}" th:object="${don}" method="post" enctype="multipart/form-data">
+    <input type="hidden" th:field="*{id}" />
+    <!-- Médicament -->
+    <div class="mb-3">
+      <label for="medicament" class="form-label">Médicament</label>
+      <select th:field="*{medicament.id}" class="form-select" id="medicament" required>
+        <option value="" disabled>-- Sélectionner un médicament --</option>
+        <option th:each="med : ${medicaments}" th:value="${med.id}" th:text="${med.nom}"
+                th:selected="${don.medicament.id == med.id}"></option>
+      </select>
+    </div>
+
+    <!-- Image actuelle -->
+    <div class="mb-3" th:if="${don.image != null}">
+      <label class="form-label">Image actuelle :</label><br>
+      <img th:src="@{'/dons/image/' + ${don.id}}" alt="Image actuelle" class="current-img">
+    </div>
+
+    <!-- Nouvelle image -->
+    <div class="mb-3">
+      <label for="imageFile" class="form-label">Changer l'image (optionnel)</label>
+      <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*">
+    </div>
+
+    <div class="d-flex justify-content-between">
+      <a th:href="@{/dons}" class="btn btn-outline-secondary">Retour</a>
+      <button type="submit" class="btn btn-custom">Enregistrer les modifications</button>
+    </div>
+  </form>
+</div>
+
+</body>
+</html>
