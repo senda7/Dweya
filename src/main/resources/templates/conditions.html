@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Conditions Générales – Dwaya</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --container-color: #ffffff;
+      --text-color: #333;
+      --btn-bg: #74ebd5;
+      --btn-hover: #5fc9bb;
+      --btn-back-bg: #bbb;
+      --btn-back-hover: #999;
+      --muted: #666;
+      --border: #e6e6e6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      color: var(--text-color);
+    }
+    .container {
+      background-color: var(--container-color);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 900px;
+    }
+    .logo {
+      width: 110px;
+      height: 110px;
+      display: block;
+      margin: 0 auto 15px;
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-8px) } }
+    .app-title {
+      font-size: 28px;
+      font-weight: bold;
+      color: #1e6b77;
+      text-align: center;
+      margin: 0 0 6px 0;
+    }
+    .subtitle {
+      text-align: center;
+      color: var(--muted);
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+    .btn-back {
+      width: auto;
+      padding: 8px 16px;
+      background-color: var(--btn-back-bg);
+      color: #333;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      margin-bottom: 20px;
+      transition: background-color 0.3s;
+      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+    .btn-back:hover { background-color: var(--btn-back-hover); color: #fff; }
+
+    .toc {
+      background: #fafafa;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin-bottom: 24px;
+    }
+    .toc h3 { margin: 0 0 10px 0; font-size: 18px; }
+    .toc ol { margin: 0; padding-left: 18px; }
+    .toc a { color: #1e6b77; text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    h2.section-title {
+      font-size: 22px;
+      margin: 22px 0 8px 0;
+      color: #114a52;
+    }
+    .section { line-height: 1.65; }
+    .callout {
+      background: #eefaf7;
+      border: 1px solid #d6f3ec;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+    .divider { height: 1px; background: var(--border); margin: 22px 0; }
+
+    .footer {
+      margin-top: 26px;
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+    }
+    .link { color: #1e6b77; text-decoration: none; }
+    .link:hover { text-decoration: underline; }
+
+    /* Smooth section reveal */
+    .fadeInSlide { animation: fadeInSlideDown 0.5s ease forwards; }
+    @keyframes fadeInSlideDown {
+      0% { opacity: 0; transform: translateY(-10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+<main class="container fadeInSlide">
+  <a href="/register" class="btn-back" aria-label="Retour à l'inscription">⟵ Retour</a>
+
+  <img th:src="@{/logo.png}" alt="Logo Dwaya" class="logo" />
+  <h1 class="app-title">Conditions Générales d'Utilisation</h1>
+  <p class="subtitle">Dernière mise à jour : <span th:text="${lastUpdated != null} ? ${lastUpdated} : '16 août 2025'"></span></p>
+
+  <section class="toc" aria-labelledby="toc-title">
+    <h3 id="toc-title">Sommaire</h3>
+    <ol>
+      <li><a href="#objet">Objet & Acceptation</a></li>
+      <li><a href="#definitions">Définitions</a></li>
+      <li><a href="#compte">Création de compte & Vérification</a></li>
+      <li><a href="#roles">Rôles & Responsabilités</a></li>
+      <li><a href="#dons-ventes">Dons, Ventes & Contenu</a></li>
+      <li><a href="#sante">Avertissement santé</a></li>
+      <li><a href="#notifications">Notifications & Rappels</a></li>
+      <li><a href="#donnees">Données personnelles & Confidentialité</a></li>
+      <li><a href="#fichiers">Fichiers & Propriété intellectuelle</a></li>
+      <li><a href="#paiement-livraison">Commandes, Paiement & Livraison</a></li>
+      <li><a href="#securite">Sécurité & Utilisation loyale</a></li>
+      <li><a href="#suspension">Suspension & Résiliation</a></li>
+      <li><a href="#modifs">Modifications des CGU</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ol>
+  </section>
+
+  <div class="divider"></div>
+
+  <section id="objet" class="section">
+    <h2 class="section-title">1. Objet & Acceptation</h2>
+    <p>
+      Les présentes Conditions Générales d’Utilisation (ci-après « CGU ») encadrent l’accès et l’utilisation de l’application « Dwaya »
+      (site web et/ou application mobile). En créant un compte ou en utilisant Dwaya, vous acceptez sans réserve les CGU.
+    </p>
+    <p class="callout">Si vous n’acceptez pas tout ou partie des CGU, veuillez ne pas utiliser l’application.</p>
+  </section>
+
+  <section id="definitions" class="section">
+    <h2 class="section-title">2. Définitions</h2>
+    <ul>
+      <li><strong>Utilisateur</strong> : toute personne physique créant un compte pour gérer ses médicaments.</li>
+      <li><strong>Pharmacie</strong> : professionnel de santé créant un compte vérifié pour proposer des services ou ventes.</li>
+      <li><strong>Espace Don/Vente</strong> : module permettant de proposer des médicaments (selon la législation en vigueur) en don ou à la vente.</li>
+      <li><strong>Rappels</strong> : notifications concernant la prise de médicaments et/ou la péremption.</li>
+    </ul>
+  </section>
+
+  <section id="compte" class="section">
+    <h2 class="section-title">3. Création de compte & Vérification</h2>
+    <p>
+      Pour créer un compte, vous devez fournir des informations exactes, complètes et à jour. Dwaya peut exiger une vérification par e‑mail
+      (code de confirmation). Les comptes « Pharmacie » nécessitent des justificatifs professionnels (licence, inscription à l’ordre,
+      pièce d’identité, autorisations) et peuvent être refusés en cas d’informations incomplètes ou non conformes.
+    </p>
+    <p>
+      Vous êtes responsable de la confidentialité de vos identifiants. Toute activité réalisée depuis votre compte est réputée vous appartenir.
+      Signalez immédiatement toute utilisation non autorisée à <a class="link" href="mailto:support@dwaya.tn">support@dwaya.tn</a>.
+    </p>
+  </section>
+
+  <section id="roles" class="section">
+    <h2 class="section-title">4. Rôles & Responsabilités</h2>
+    <ul>
+      <li><strong>Utilisateur</strong> : gère ses stocks, ses rappels et peut publier des annonces conformes à la loi.</li>
+      <li><strong>Pharmacie</strong> : fournit des informations véridiques, respecte les obligations professionnelles et la législation pharmaceutique.</li>
+      <li><strong>Dwaya</strong> : plateforme d’intermédiation. Dwaya n’est ni vendeur, ni dispensateur de soins, sauf mention expresse contraire.</li>
+    </ul>
+  </section>
+
+  <section id="dons-ventes" class="section">
+    <h2 class="section-title">5. Dons, Ventes & Contenu</h2>
+    <ul>
+      <li>Le contenu posté (annonces, images, commentaires) doit être licite, non mensonger, et respecter les droits de tiers.</li>
+      <li>Certains médicaments peuvent être soumis à des restrictions légales (ordonnance, interdictions). L’Utilisateur/Pharmacie doit s’y conformer.</li>
+      <li>Dwaya peut modérer, supprimer ou suspendre tout contenu non conforme, sans préavis.</li>
+      <li>Vous garantissez disposer des droits sur les contenus publiés et concédez à Dwaya une licence non‑exclusive pour les besoins de la plateforme.</li>
+    </ul>
+  </section>
+
+  <section id="sante" class="section">
+    <h2 class="section-title">6. Avertissement santé</h2>
+    <p>
+      Les informations de Dwaya (rappels, notices, dates de péremption) sont fournies à titre indicatif et ne remplacent en aucun cas l’avis d’un
+      professionnel de santé. En cas de doute, consultez votre médecin ou votre pharmacien.
+    </p>
+  </section>
+
+  <section id="notifications" class="section">
+    <h2 class="section-title">7. Notifications & Rappels</h2>
+    <p>
+      Vous pouvez activer des rappels (par exemple 08:00, 13:00, 20:00) et des alertes de péremption. Leur bonne réception dépend de votre appareil
+      et de vos réglages (réseaux, autorisations). Dwaya ne peut garantir la livraison de chaque notification.
+    </p>
+  </section>
+
+  <section id="donnees" class="section">
+    <h2 class="section-title">8. Données personnelles & Confidentialité</h2>
+    <p>
+      Dwaya traite vos données conformément à sa <a class="link" href="/confidentialite">Politique de Confidentialité</a>.
+      Les principales finalités : création de compte, gestion des rappels, sécurisation des accès, lutte contre la fraude, relations client.
+      Vous disposez de droits d’accès, de rectification et de suppression (dans les limites légales) via <a class="link" href="mailto:privacy@dwaya.tn">privacy@dwaya.tn</a>.
+    </p>
+  </section>
+
+  <section id="fichiers" class="section">
+    <h2 class="section-title">9. Fichiers & Propriété intellectuelle</h2>
+    <ul>
+      <li>Les fichiers fournis par les Pharmacies (registre de commerce, CIN, autorisations) doivent être lisibles et authentiques.</li>
+      <li>Vous vous engagez à ne pas uploader de contenu illicite, malveillant, ou portant atteinte aux droits d’auteur.</li>
+      <li>Le logo, la marque et l’interface Dwaya sont protégés. Toute reproduction non autorisée est interdite.</li>
+    </ul>
+  </section>
+
+  <section id="paiement-livraison" class="section">
+    <h2 class="section-title">10. Commandes, Paiement & Livraison</h2>
+    <p>
+      Si l’Espace Pharmacie permet la commande et/ou la livraison, ces opérations sont soumises aux conditions spécifiques affichées au moment
+      de l’achat (prix, frais, délais, politique de retour). Les prestataires de paiement et de livraison peuvent avoir leurs propres conditions
+      auxquelles vous devez adhérer.
+    </p>
+  </section>
+
+  <section id="securite" class="section">
+    <h2 class="section-title">11. Sécurité & Utilisation loyale</h2>
+    <ul>
+      <li>Interdits : spam, scraping massif, ingénierie inverse, contournement des mesures de sécurité, usurpation d’identité.</li>
+      <li>Vous devez maintenir vos appareils à jour et protégés (mots de passe robustes, antivirus, etc.).</li>
+    </ul>
+  </section>
+
+  <section id="suspension" class="section">
+    <h2 class="section-title">12. Suspension & Résiliation</h2>
+    <p>
+      Dwaya peut suspendre ou résilier un compte en cas de non‑respect des CGU, de fraude, d’atteinte à la sécurité ou sur demande légale.
+      Vous pouvez supprimer votre compte depuis votre profil ; certaines données peuvent être conservées à des fins légales.
+    </p>
+  </section>
+
+  <section id="modifs" class="section">
+    <h2 class="section-title">13. Modifications des CGU</h2>
+    <p>
+      Les CGU peuvent être modifiées pour des raisons légales, techniques ou fonctionnelles. En cas de changement substantiel, vous serez informé
+      par un moyen approprié. La poursuite de l’utilisation de Dwaya vaut acceptation des CGU mises à jour.
+    </p>
+  </section>
+
+  <section id="contact" class="section">
+    <h2 class="section-title">14. Contact</h2>
+    <p>
+      Société/Éditeur : <strong>Dwaya</strong><br/>
+      Support : <a class="link" href="mailto:support@dwaya.tn">support@dwaya.tn</a><br/>
+      Protection des données : <a class="link" href="mailto:privacy@dwaya.tn">privacy@dwaya.tn</a>
+    </p>
+  </section>
+
+  <div class="divider"></div>
+
+  <p class="footer">
+    © <span th:text="${#temporals.format(#temporals.createNow(), 'yyyy')}">2025</span> Dwaya — Tous droits réservés ·
+    <a class="link" href="/conditions">Conditions Générales</a> ·
+  </p>
+</main>
+
+<script>
+  // Défilement doux vers les ancres
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', (e) => {
+      const id = a.getAttribute('href');
+      if (!id || id === '#') return;
+      const el = document.querySelector(id);
+      if (el) {
+        e.preventDefault();
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+</script>
+</body>
+</html>

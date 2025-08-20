@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier un rappel | Dwaya</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+          --bg-gradient-start: #74ebd5;
+          --bg-gradient-end: #ACB6E5;
+          --container-bg: #ffffff;
+          --primary-color: #1e6b77;
+          --btn-bg: #74ebd5;
+          --btn-hover: #5fc9bb;
+        }
+
+        body {
+          margin: 0;
+          font-family: 'Roboto', sans-serif;
+          background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+          min-height: 100vh;
+          display: flex;
+          justify-content: center;
+          align-items: flex-start;
+          padding: 40px 15px;
+        }
+
+        .container {
+          background-color: var(--container-bg);
+          padding: 40px 30px;
+          border-radius: 20px;
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+          width: 100%;
+          max-width: 600px;
+        }
+
+        h2 {
+          color: var(--primary-color);
+          font-weight: bold;
+          margin-bottom: 30px;
+          text-align: center;
+        }
+
+        label {
+          font-weight: 500;
+          color: #333;
+        }
+
+        select, input[type="number"], input[type="time"] {
+          width: 100%;
+          padding: 10px;
+          border-radius: 8px;
+          border: 1px solid #ccc;
+          margin-top: 5px;
+          background-color: #fff;
+          transition: 0.3s;
+        }
+
+        input:focus, select:focus {
+          border-color: var(--btn-bg);
+          outline: none;
+          box-shadow: 0 0 6px rgba(116, 235, 213, 0.5);
+        }
+
+        .btn-success {
+          background-color: var(--btn-bg);
+          border: none;
+        }
+
+        .btn-success:hover {
+          background-color: var(--btn-hover);
+        }
+
+        .btn-secondary {
+          margin-left: 10px;
+        }
+    </style>
+
+    <script>
+        function genererChampsHeure() {
+          const container = document.getElementById("heuresContainer");
+          container.innerHTML = "";
+          const frequence = document.getElementById("frequence").value;
+
+          for (let i = 0; i < frequence; i++) {
+            const input = document.createElement("input");
+            input.type = "time";
+            input.name = "heuresPrise[" + i + "]";
+            input.className = "form-control mb-2";
+            input.required = true;
+            container.appendChild(input);
+          }
+        }
+    </script>
+</head>
+<body>
+
+<div class="container">
+    <h2>Modifier un rappel</h2>
+
+    <form th:action="@{/modifier-rappel}" method="post" th:object="${rappel}">
+        <input type="hidden" th:field="*{id}"/>
+
+        <div class="mb-3">
+            <label>Médicament :</label>
+            <select th:field="*{medicament}" class="form-select" required>
+                <option th:each="med : ${medicaments}"
+                        th:value="${med.id}"
+                        th:text="${med.nom}"
+                        th:selected="${med.id == rappel.medicament.id}">
+                </option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label>Fréquence (fois/jour) :</label>
+            <input type="number" id="frequence" class="form-control"
+                   th:field="*{frequence}" min="1"
+                   onchange="genererChampsHeure()" required />
+        </div>
+
+        <div id="heuresContainer" class="mb-3">
+            <label>Heures de prise :</label>
+            <div th:each="heure, iterStat : *{heuresPrise}">
+                <input type="time"
+                       th:name="'heuresPrise[' + ${iterStat.index} + ']'"
+                       th:value="${heure}"
+                       class="form-control mb-2" required />
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success">Enregistrer les modifications</button>
+        <a href="/rappels" class="btn btn-secondary">Annuler</a>
+    </form>
+</div>
+
+</body>
+</html>
