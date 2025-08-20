@@ -126,6 +126,9 @@ public class LoginController {
         if ("pharmacie".equals(roleName)) {
             model.addAttribute("message", "Votre compte a été créé avec succès. En attente de validation par l’administrateur.");
             return "login";
+        } else if ("utilisateur".equals(roleName)) {
+            model.addAttribute("message", "Votre compte a été créé avec succès, veuillez vous connecter.");
+            return "login";
         } else {
             return "redirect:/login";
         }
@@ -146,6 +149,19 @@ public class LoginController {
 
         return "utilisateur/profil-utilisateur";
     }
+    // --- --------Affichage profil utilisateur ---
+    @GetMapping("/profil-admin")
+    public String profilAdmin(Model model, HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) return "redirect:/login";
+
+        Utilisateur utilisateur = utilisateurRepository.findById(userId).orElse(null);
+        if (utilisateur == null) return "redirect:/login";
+
+        model.addAttribute("utilisateur", utilisateur);
+
+        return "admin/profil-admin";
+    }
 
     // --- ---------Affichage profil utilisateur pharma ---
     @GetMapping("/profil-pharmacie")
@@ -159,22 +175,6 @@ public class LoginController {
         model.addAttribute("utilisateur", utilisateur);
 
         return "pharmacie/profil-pharmacie"; // vérifie aussi le nom du fichier HTML dans templates
-    }
-
-    // --- Endpoint pour afficher la photo de profil ---
-    @GetMapping("/utilisateur/photo/{id}")
-    @ResponseBody
-    public ResponseEntity<byte[]> getPhoto(@PathVariable Long id) {
-        Utilisateur user = utilisateurRepository.findById(id).orElse(null);
-
-        if (user == null || user.getPhotoProfil() == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.IMAGE_PNG); // ⚡ Change en JPEG si nécessaire
-
-        return ResponseEntity.ok().headers(headers).body(user.getPhotoProfil());
     }
 
     // --- Modification du profil utilisateur ---
@@ -299,49 +299,6 @@ public class LoginController {
         utilisateurRepository.save(utilisateur);
 
         return "redirect:/profil-utilisateur?success=Mot de passe changé avec succès";
-    }
-
-
-    // --- Changer photo de profil utilisateur ---
-    @PostMapping("/utilisateur/changer-photo")
-    public String changerPhoto(@RequestParam("photoProfil") MultipartFile photo, HttpSession session) {
-        Long userId = (Long) session.getAttribute("userId");
-        if (userId == null) return "redirect:/login";
-
-        Utilisateur utilisateur = utilisateurRepository.findById(userId).orElse(null);
-        if (utilisateur == null) return "redirect:/login";
-
-        if (photo != null && !photo.isEmpty()) {
-            try {
-                utilisateur.setPhotoProfil(photo.getBytes());
-                utilisateurRepository.save(utilisateur);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return "redirect:/profil-utilisateur?error";
-            }
-        }
-
-        return "redirect:/profil-utilisateur?success";
-    }
-    //----------changer photo de profil pharamacie-----
-    @PostMapping("/pharmacie/changer-photo")
-    public String changerPhotos(@RequestParam("photoProfil") MultipartFile photo, HttpSession session) {
-        Long userId = (Long) session.getAttribute("userId");
-        if (userId == null) return "redirect:/login";
-
-        Utilisateur utilisateur = utilisateurRepository.findById(userId).orElse(null);
-        if (utilisateur == null) return "redirect:/login";
-
-        if (photo != null && !photo.isEmpty()) {
-            try {
-                utilisateur.setPhotoProfil(photo.getBytes());
-                utilisateurRepository.save(utilisateur);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return "redirect:/profil-pharmacie?error";
-            }
-        }
-        return "redirect:/profil-pharmacie?success";
     }
 
     // conditions.html dans templates

@@ -181,12 +181,6 @@
                 <div class="row">
                     <!-- Colonne Gauche -->
                     <div class="col-md-4 text-center left-column">
-                        <!--  Affiche la photo actuelle -->
-                        <div class="text-center mb-3">
-                            <img th:src="@{'/utilisateur/photo/' + ${utilisateur.id}}"
-                                 alt="Photo actuelle"
-                                 class="profile-img">
-                        </div>
 
                         <a class="settings-link mt-2" onclick="toggleParametres()">
                             <i class="fas fa-cog me-1"></i> Paramètres du compte
@@ -197,9 +191,6 @@
                             </button>
                             <button class="btn btn-outline-primary w-100 mb-2" onclick="showEdit()">
                                 <i class="fas fa-edit me-2"></i>Modifier les informations
-                            </button>
-                            <button class="btn btn-outline-primary w-100 mb-2" onclick="showPhotoSection()">
-                                <i class="fas fa-image me-2"></i>Changer la photo de profil
                             </button>
                             <button class="btn btn-outline-primary w-100 mb-2" onclick="showPasswordForm()">
                                 <i class="fas fa-key me-2"></i>Changer le mot de passe
@@ -341,27 +332,6 @@
                         </div>
 
 
-                        <!-- Zone changement photo -->
-                        <div id="photo-section" style="display: none;">
-                            <h4 class="mb-3" style="color: var(--turquoise); font-weight: bold;">
-                                Changer la photo de profil
-                            </h4>
-
-                            <!-- Formulaire pour uploader la nouvelle photo -->
-                            <form th:action="@{/pharmacie/changer-photo}" method="post" enctype="multipart/form-data">
-                                <input type="hidden" name="id" th:value="${utilisateur.id}">
-                                <div class="mb-3">
-                                    <input type="file" name="photoProfil" accept="image/*" required class="form-control" />
-                                </div>
-
-
-                                <div class="d-flex justify-content-end">
-                                    <button type="button" class="btn btn-light me-2" onclick="showInfo()" style="background-color: #f8f9fa; color: #333;">Réinitialiser</button>
-                                    <button type="submit" class="btn btn-light" style="background-color: #f8f9fa; color: #333;">Envoyer</button>
-                                </div>
-                            </form>
-                        </div>
-
 
                         <!-- Zone changement mot de passe -->
                         <div id="password-section" style="display: none;">
@@ -423,12 +393,6 @@
         document.getElementById('photo-section').style.display = 'none';
     }
 
-    function showPhotoSection() {
-        document.getElementById('info-section').style.display = 'none';
-        document.getElementById('edit-section').style.display = 'none';
-        document.getElementById('password-section').style.display = 'none';
-        document.getElementById('photo-section').style.display = 'block';
-    }
 
     // Validation mot de passe
     document.addEventListener("DOMContentLoaded", function () {

@@ -24,9 +24,7 @@ public class Utilisateur {
     private String ville;
     private String motDePasse;
 
-    @Lob
-    @Column(columnDefinition = "LONGBLOB")
-    private byte[] photoProfil;
+
 
     // ===== Type d'utilisateur =====
     @Enumerated(EnumType.STRING)
@@ -113,8 +111,7 @@ public class Utilisateur {
     public String getMotDePasse() { return motDePasse; }
     public void setMotDePasse(String motDePasse) { this.motDePasse = motDePasse; }
 
-    public byte[] getPhotoProfil() { return photoProfil; }
-    public void setPhotoProfil(byte[] photoProfil) { this.photoProfil = photoProfil; }
+
 
     public TypeUtilisateur getTypeUtilisateur() { return typeUtilisateur; }
     public void setTypeUtilisateur(TypeUtilisateur typeUtilisateur) {
