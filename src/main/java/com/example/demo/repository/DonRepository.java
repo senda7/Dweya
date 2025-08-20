@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface DonRepository extends JpaRepository<Don, Long> {
 
-    // Récupérer tous les dons liés aux médicaments d'un utilisateur
+    // Récupérer tous les dons liés aux médicaments d'un utilisateurs
     List<Don> findByMedicament_Utilisateur_Id(Long utilisateurId);
 
     // Récupérer tous les dons pour un médicament spécifique
