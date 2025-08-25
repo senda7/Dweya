@@ -70,6 +70,9 @@ public class Utilisateur {
 
     @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL)
     private List<Medicament> medicaments;
+    @OneToMany(mappedBy = "pharmacie", cascade = CascadeType.ALL)
+    private List<Medpharmacie> stock;
+
 
     public enum TypeUtilisateur {
         ADMIN,

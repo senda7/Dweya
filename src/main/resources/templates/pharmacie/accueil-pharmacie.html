@@ -24,6 +24,8 @@
           background-color: #ffffff;
           color: var(--text-color);
           min-height: 100vh;
+          display: flex;
+          flex-direction: column;
         }
 
         /* Navbar fixe */
@@ -37,22 +39,72 @@
           justify-content: space-between;
           align-items: center;
           padding: 15px 40px;
+          flex-wrap: wrap;
         }
 
         .logo-container {
           display: flex;
           align-items: center;
+          flex: 1;
         }
+
         .logo {
           width: 110px;
           height: 110px;
-          margin-bottom: 10px;
           animation: float 3s ease-in-out infinite;
         }
 
         @keyframes float {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-8px); }
+        }
+
+        .nav-links {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-wrap: wrap;
+          flex: 2;
+          gap: 15px;
+        }
+
+        .nav-links a {
+          text-decoration: none;
+          color: var(--text-color);
+          font-weight: 500;
+          transition: color 0.3s;
+          padding: 8px 12px;
+          white-space: nowrap;
+        }
+
+        .nav-links a:hover {
+          color: var(--btn-hover);
+        }
+
+        .nav-actions {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+          flex: 1;
+          justify-content: flex-end;
+        }
+
+        .icon-links {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+        }
+
+        .icon-links svg {
+          width: 50px;
+          height: 50px;
+          fill: var(--btn-bg);
+          cursor: pointer;
+          transition: fill 0.3s;
+        }
+
+        .icon-links svg:hover {
+          fill: var(--btn-hover);
         }
 
         .logout-btn {
@@ -63,6 +115,7 @@
           border-radius: 8px;
           cursor: pointer;
           transition: 0.3s;
+          white-space: nowrap;
         }
 
         .logout-btn:hover {
@@ -74,6 +127,11 @@
         .hero {
           padding: 80px 20px 60px;
           text-align: center;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
         }
 
         .hero h1 {
@@ -88,6 +146,8 @@
           max-width: 700px;
           margin: auto;
           animation: fadeInUp 1.5s ease;
+          line-height: 1.6;
+          text-align: center;
         }
 
         @keyframes fadeInDown {
@@ -99,50 +159,45 @@
           from { opacity: 0; transform: translateY(30px); }
           to { opacity: 1; transform: translateY(0); }
         }
-         .nav-links {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          flex-wrap: wrap;
+
+        /* Media queries pour la responsivité */
+        @media (max-width: 992px) {
+          nav {
+            flex-direction: column;
+            padding: 15px 20px;
+          }
+
+          .logo-container {
+            justify-content: center;
+            margin-bottom: 15px;
+          }
+
+          .nav-links {
+            margin: 15px 0;
+            width: 100%;
+            justify-content: center;
+          }
+
+          .nav-actions {
+            width: 100%;
+            justify-content: center;
+          }
         }
 
-        .nav-links a {
-          margin: 0 12px;
-          text-decoration: none;
-          color: var(--text-color);
-          font-weight: 500;
-          transition: color 0.3s;
-        }
+        @media (max-width: 576px) {
+          .nav-links {
+            flex-direction: column;
+            gap: 10px;
+          }
 
-        .nav-links a:hover {
-          color: var(--btn-hover);
-        }
+          .hero h1 {
+            font-size: 32px;
+          }
 
-        .nav-actions {
-          display: flex;
-          align-items: center;
-          gap: 20px;
+          .hero p {
+            font-size: 16px;
+          }
         }
-
-        .icon-links {
-          display: flex;
-          align-items: center;
-          gap: 15px;
-        }
-
-        .icon-links svg {
-          width:50px;
-          height:50px;
-          fill: var(--btn-bg);
-          cursor: pointer;
-          transition: fill 0.3s;
-          margin:15px;
-        }
-
-        .icon-links svg:hover {
-          fill: var(--btn-hover);
-        }
-
     </style>
 </head>
 <body>
@@ -157,8 +212,8 @@
     <!-- Liens de navigation -->
     <div class="nav-links">
         <a th:href="@{/accueil-pharmacie}">Accueil</a>
-        <a th:href="@{/stock}">gestion de stock</a>
-        <a th:href="@{/ges_dons}">gestion des dons</a>
+        <a th:href="@{/stock}">Gestion de stock</a>
+        <a th:href="@{/ges_dons}">Gestion des dons</a>
         <a th:href="@{/commandes}">Commandes</a>
         <a th:href="@{/profil-pharmacie}">Profil</a>
     </div>
@@ -187,7 +242,7 @@
         <p class="description">
             Gérez vos commandes et votre stock, suivez vos ventes,<br>
             recevez et redistribuez les dons en toute sécurité. <br>
-            utilisez le menu ci-dessus pour naviguer entre les différentes sections.
+            Utilisez le menu ci-dessus pour naviguer entre les différentes sections.
         </p>
     </div>
 </section>
