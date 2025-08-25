@@ -11,13 +11,15 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateur, Long> 
     // Pour login
     Utilisateur findByEmailAndMotDePasse(String email, String motDePasse);
 
-    // 🔹 Pour gérer les utilisateurs selon leur type (admin, utilisateur, pharmacie)
+    //  Pour gérer les utilisateurs selon leur type (admin, utilisateur, pharmacie)
     List<Utilisateur> findByTypeUtilisateur(TypeUtilisateur typeUtilisateur);
 
-    // 🔹 Pour lister les pharmacies en attente de validation (etat = false)
+    //  Pour lister les pharmacies en attente de validation (etat = false)
     List<Utilisateur> findByTypeUtilisateurAndEtat(TypeUtilisateur typeUtilisateur, boolean etat);
 
-    // 🔹 Pour la récupération de compte par email
+    // Pour la récupération de compte par email
     Utilisateur findByEmail(String email);
+    //pour la recuperation de compte par role
+    List<Utilisateur> findByRoleId(Long roleId);
 }
 

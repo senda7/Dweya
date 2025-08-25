@@ -25,7 +25,6 @@ public class Utilisateur {
     private String motDePasse;
 
 
-
     // ===== Type d'utilisateur =====
     @Enumerated(EnumType.STRING)
     private TypeUtilisateur typeUtilisateur;
@@ -68,6 +67,7 @@ public class Utilisateur {
 
     @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL)
     private List<Medicament> medicaments;
+
 
     public enum TypeUtilisateur {
         ADMIN,

@@ -9,7 +9,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.Optional;
 
 @Controller
@@ -19,7 +18,7 @@ public class FichierController {
     @Autowired
     private UtilisateurRepository utilisateurRepository;
 
-    // 📂 Détecte le type MIME à partir des premiers octets du fichier
+    // Détecte le type MIME à partir des premiers octets du fichier
     private String detectMimeType(byte[] data) {
         if (data == null || data.length < 4) return "application/octet-stream";
 
@@ -35,7 +34,7 @@ public class FichierController {
         return "application/octet-stream";
     }
 
-    // 📂 Méthode générique pour servir le fichier
+    // Méthode générique pour servir le fichier
     private ResponseEntity<ByteArrayResource> getFile(byte[] data, String filename) {
         if (data == null || data.length == 0) return ResponseEntity.notFound().build();
 
@@ -48,7 +47,7 @@ public class FichierController {
                 .body(new ByteArrayResource(data));
     }
 
-    // 📂 Registre de commerce
+    // Registre de commerce
     @GetMapping("/registreCommerce/{id}")
     public ResponseEntity<ByteArrayResource> voirRegistre(@PathVariable Long id) {
         Optional<Utilisateur> utilisateurOpt = utilisateurRepository.findById(id);
@@ -56,7 +55,7 @@ public class FichierController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // 📂 CIN pharmacien
+    //  CIN pharmacien
     @GetMapping("/cinPharmacien/{id}")
     public ResponseEntity<ByteArrayResource> voirCIN(@PathVariable Long id) {
         Optional<Utilisateur> utilisateurOpt = utilisateurRepository.findById(id);
@@ -64,7 +63,7 @@ public class FichierController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // 📂 Autorisation Ministère
+    // Autorisation Ministère
     @GetMapping("/autorisationMinistere/{id}")
     public ResponseEntity<ByteArrayResource> voirAutorisation(@PathVariable Long id) {
         Optional<Utilisateur> utilisateurOpt = utilisateurRepository.findById(id);

@@ -163,7 +163,7 @@
     <div class="nav-links">
         <a th:href="@{/accueil-pharmacie}">Accueil</a>
         <a th:href="@{/stock}">gestion de stock</a>
-        <a th:href="@{/ges_dons}">gestion des dons</a>
+        <a th:href="@{/dons-pharmacie}">gestion des dons</a>
         <a th:href="@{/commandes}">Commandes</a>
         <a th:href="@{/profil-pharmacie}">Profil</a>
     </div>
@@ -235,6 +235,10 @@
                                 <div class="col-sm-5 info-title">Adresse :</div>
                                 <div class="col-sm-7 info-text" th:text="${utilisateur.adresse}"></div>
                             </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5 info-title">Ville :</div>
+                                <div class="col-sm-7 info-text" th:text="${utilisateur.ville}"></div>
+                            </div>
 
                             <div class="row mb-2">
                                 <div class="col-sm-5 info-title">Téléphone :</div>
@@ -299,6 +303,9 @@
                                 <div class="mb-2">
                                     <input type="text" class="form-control" name="adresse" placeholder="Adresse complète" th:value="${utilisateur.adresse}">
                                 </div>
+                                    <div class="mb-2">
+                                        <input type="text" class="form-control" name="ville" placeholder="Ville" th:value="${utilisateur.ville}">
+                                    </div>
 
                                 <div class="mb-2">
                                     <input type="text" class="form-control" name="telephone" placeholder="Téléphone" th:value="${utilisateur.telephone}">
@@ -330,7 +337,6 @@
                                 </div>
                             </form>
                         </div>
-
 
 
                         <!-- Zone changement mot de passe -->
@@ -392,6 +398,7 @@
         document.getElementById('password-section').style.display = 'block';
         document.getElementById('photo-section').style.display = 'none';
     }
+
 
 
     // Validation mot de passe

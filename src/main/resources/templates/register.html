@@ -171,7 +171,6 @@
   </style>
   <script th:inline="javascript">
     /*<![CDATA[*/
-    // تحويل قائمة الأدوار من الباك إند إلى مصفوفة جافاسكريبت صحيحة
     const roles = /*[[${roles}]]*/ [];
     /*]]>*/
   </script>
@@ -188,7 +187,6 @@
       userForm.classList.remove("fadeInSlide");
       pharmaForm.classList.remove("fadeInSlide");
 
-      // البحث عن roleId حسب الاسم بحروف صغيرة
       const role = roles.find(r => r.nom.toLowerCase() === roleNom);
       const roleId = role ? role.id : null;
 
@@ -215,7 +213,6 @@
       userForm.classList.remove("fadeInSlide");
       pharmaForm.classList.remove("fadeInSlide");
 
-      // إعادة تعيين أزرار الراديو
       const radios = document.getElementsByName("roleChoice");
       radios.forEach(r => r.checked = false);
     }
@@ -226,7 +223,6 @@
   <img th:src="@{/logo.png}" alt="Logo Dwaya" class="logo" />
   <h2 class="app-title">Créer un compte</h2>
 
-  <!-- اختيار الدور -->
   <div id="choix-role">
     <p style="text-align:center; font-size:17px; margin-bottom:15px;">
       Vous voulez créer un compte en tant que :
@@ -243,7 +239,7 @@
     </div>
   </div>
 
-  <!-- نموذج المستخدم -->
+  <!-- formulaire utilisateur -->
   <form th:action="@{/register}" method="post" th:object="${utilisateur}" enctype="multipart/form-data" id="form-utilisateur" style="display:none; text-align:left;">
     <button type="button" class="btn-back" onclick="retourQuestion()">← Retour</button>
     <input type="hidden" id="roleId-utilisateur" name="roleId" value="" />
@@ -281,7 +277,7 @@
     <button type="submit" class="btn">S’inscrire</button>
   </form>
 
-  <!-- نموذج الصيدلية -->
+  <!-- formulaire pharmacie -->
   <form th:action="@{/register}" method="post" th:object="${utilisateur}" enctype="multipart/form-data" id="form-pharmacie" style="display:none; text-align:left;">
     <button type="button" class="btn-back" onclick="retourQuestion()">← Retour</button>
     <input type="hidden" id="roleId-pharmacie" name="roleId" value="" />
@@ -297,6 +293,8 @@
     <input type="text" th:field="*{numeroOrdre}" required />
     <label>Adresse complète :</label>
     <input type="text" th:field="*{adresse}" required />
+    <label>Ville :</label>
+    <input type="text" th:field="*{ville}" required />
     <label>Téléphone :</label>
     <input type="text" th:field="*{telephone}" required />
     <label>Email professionnel :</label>

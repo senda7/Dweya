@@ -6,9 +6,6 @@ import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.UtilisateurRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -66,8 +63,6 @@ public class LoginController {
         model.addAttribute("roles", roles);
         return "register";
     }
-
-    // --- Traitement inscription ---
     // --- Traitement inscription ---
     @PostMapping("/register")
     public String registerSubmit(
@@ -134,8 +129,6 @@ public class LoginController {
         }
     }
 
-
-
     // --- --------Affichage profil utilisateur ---
     @GetMapping("/profil-utilisateur")
     public String profilUtilisateur(Model model, HttpSession session) {
@@ -162,7 +155,6 @@ public class LoginController {
 
         return "admin/profil-admin";
     }
-
     // --- ---------Affichage profil utilisateur pharma ---
     @GetMapping("/profil-pharmacie")
     public String profilPharmacie(Model model, HttpSession session) {
@@ -176,7 +168,6 @@ public class LoginController {
 
         return "pharmacie/profil-pharmacie"; // vérifie aussi le nom du fichier HTML dans templates
     }
-
     // --- Modification du profil utilisateur ---
     @PostMapping("/utilisateur/modifier")
     public String modifierUtilisateur(@ModelAttribute Utilisateur utilisateurModifie) {
@@ -242,6 +233,9 @@ public class LoginController {
             if (pharmacieModifiee.getAdresse() != null && !pharmacieModifiee.getAdresse().isEmpty()) {
                 ancienne.setAdresse(pharmacieModifiee.getAdresse());
             }
+            if (pharmacieModifiee.getVille() != null && !pharmacieModifiee.getVille().isEmpty()) {
+                ancienne.setVille(pharmacieModifiee.getVille());
+            }
             if (pharmacieModifiee.getTelephone() != null && !pharmacieModifiee.getTelephone().isEmpty()) {
                 ancienne.setTelephone(pharmacieModifiee.getTelephone());
             }
@@ -260,7 +254,7 @@ public class LoginController {
                     ancienne.setAutorisationMinistere(autorisationMinistereFile.getBytes());
                 }
             } catch (IOException e) {
-                e.printStackTrace(); // ou logger.error(...)
+                e.printStackTrace();
             }
 
             utilisateurRepository.save(ancienne);
@@ -349,10 +343,6 @@ public class LoginController {
             return "redirect:/login";
         }
     }
-
-  //************************************
-
-
 
 
 

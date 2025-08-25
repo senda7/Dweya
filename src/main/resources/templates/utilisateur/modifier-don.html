@@ -23,32 +23,6 @@
       background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
       min-height: 100vh;
     }
-    nav {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      background-color: #fff;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px 40px;
-    }
-    .logo-container { display: flex; align-items: center; }
-    .logo { width: 110px; height: 110px; margin-bottom: 10px; animation: float 3s ease-in-out infinite; }
-    @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);} }
-    .nav-links a { margin: 0 12px; text-decoration: none; color: var(--text-color); font-weight: 500; transition: color 0.3s; }
-    .nav-links a:hover { color: var(--btn-hover); }
-    .logout-btn {
-      background-color: transparent;
-      border: 2px solid var(--btn-bg);
-      color: var(--btn-bg);
-      padding: 8px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    .logout-btn:hover { background-color: var(--btn-bg); color: white; }
     .container {
       background-color: var(--container-bg);
       padding: 40px 30px;
@@ -66,38 +40,38 @@
 </head>
 <body>
 
-<nav>
-  <div class="logo-container">
-    <img th:src="@{/logo.png}" alt="Logo Dwaya" class="logo">
-  </div>
-
-  <div class="nav-links">
-    <a th:href="@{/accueil-utilisateur}">Accueil</a>
-    <a th:href="@{/medicament}">Médicaments</a>
-    <a th:href="@{/rappels}">Rappels</a>
-    <a th:href="@{/dons}">Dons</a>
-    <a th:href="@{/pharmacies}">Pharmacies</a>
-    <a th:href="@{/profil-utilisateur}">Profil</a>
-  </div>
-
-  <form th:action="@{/logout}" method="post">
-    <button type="submit" class="logout-btn">Déconnexion</button>
-  </form>
-</nav>
-
 <div class="container">
   <h2 class="section-title">Modifier le Don</h2>
 
   <form th:action="@{/dons/modifier}" th:object="${don}" method="post" enctype="multipart/form-data">
     <input type="hidden" th:field="*{id}" />
+
     <!-- Médicament -->
     <div class="mb-3">
-      <label for="medicament" class="form-label">Médicament</label>
+      <label for="medicament" class="form-label">Médicament:</label>
       <select th:field="*{medicament.id}" class="form-select" id="medicament" required>
         <option value="" disabled>-- Sélectionner un médicament --</option>
         <option th:each="med : ${medicaments}" th:value="${med.id}" th:text="${med.nom}"
                 th:selected="${don.medicament.id == med.id}"></option>
       </select>
+    </div>
+
+    <!-- Pharmacie -->
+    <div class="mb-3">
+      <label for="pharmacie" class="form-label">Pharmacie destinataire:</label>
+      <select th:field="*{pharmacie}" class="form-select" id="pharmacie" required>
+        <option value="" disabled>-- Sélectionner une pharmacie --</option>
+        <option th:each="pharma : ${pharmacies}"
+                th:value="${pharma.id}"
+                th:text="${pharma.nomPharmacie} + ' - ' + ${pharma.nom} + ' ' + ${pharma.prenom}"
+                th:selected="${don.pharmacie != null and don.pharmacie.id == pharma.id}">
+        </option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="description" class="form-label">Description:</label>
+      <textarea th:field="*{description}" class="form-control" id="description" rows="4"
+                placeholder="État du médicament, détails supplémentaires..."></textarea>
     </div>
 
     <!-- Image actuelle -->

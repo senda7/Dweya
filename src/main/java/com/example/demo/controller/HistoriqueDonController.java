@@ -1,5 +1,5 @@
 package com.example.demo.controller;
-
+import jakarta.servlet.http.HttpSession;
 import com.example.demo.model.Don;
 import com.example.demo.model.StatutDon;
 import com.example.demo.repository.DonRepository;
@@ -18,11 +18,30 @@ public class HistoriqueDonController {
         this.donRepository = donRepository;
     }
 
-    @GetMapping("/admin/dons/historique")
-    public String afficherHistoriqueDons(Model model) {
-        // Récupère tous les dons acceptés ou refusés
-        List<Don> donsHistoriques = donRepository.findByStatutIn(List.of(StatutDon.ACCEPTE, StatutDon.REFUSE));
+    @GetMapping("/pharmacie/dons/historique")
+    public String afficherHistoriqueDons(HttpSession session, Model model) {
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) return "redirect:/login";
+
+        // Récupère tous les dons acceptés ou refusés pour la pharmacie connectée
+        List<Don> donsHistoriques = donRepository.findByPharmacie_IdAndStatutIn(
+                userId, List.of(StatutDon.ACCEPTE, StatutDon.REFUSE)
+        );
         model.addAttribute("donsHistoriques", donsHistoriques);
-        return "admin/historique-dons"; // correspond au nom du fichier HTML
+        return "pharmacie/historique-dons";
     }
+
+    @GetMapping("/mes-historique")
+    public String afficherHistoriqueDonsUtilisateur(HttpSession session, Model model) {
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) return "redirect:/login";
+
+        // Récupère uniquement les dons de l'utilisateur connectée et qui sont ACCEPTES ou REFUSES
+        List<Don> donsHistoriques = donRepository.findByMedicament_Utilisateur_IdAndStatutIn(
+                userId, List.of(StatutDon.ACCEPTE, StatutDon.REFUSE)
+        );
+        model.addAttribute("donsHistoriques", donsHistoriques);
+        return "utilisateur/mes-historique";
+    }
+
 }

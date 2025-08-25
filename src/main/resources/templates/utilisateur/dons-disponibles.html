@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mes dons | Dwaya</title>
+  <title>Dons Disponibles | Dwaya</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://kit.fontawesome.com/a2e0e6fa41.js" crossorigin="anonymous"></script>
@@ -32,7 +32,7 @@
       border-radius: 20px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.2);
       width: 100%;
-      max-width: 900px;
+      max-width: 1000px;
       margin: 30px auto;
     }
 
@@ -71,50 +71,51 @@
       width: 200px;
       height: 150px;
     }
+
+    .search-bar input {
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      padding: 8px 12px;
+      margin-right: 10px;
+      width: 200px;
+    }
   </style>
 </head>
 <body>
-<!-- Mes Dons -->
-<div class="container">
-  <h2 class="section-title">Mes Dons</h2>
 
-  <div class="d-flex justify-content-between mb-3">
+<div class="container">
+  <h2 class="section-title">Dons Disponibles</h2>
+  <div class="d-flex justify-content-between mb-4">
     <!-- Retour vers espace-dons -->
     <a th:href="@{/espace-dons}" class="btn btn-custom">
       <i class="fas fa-arrow-left me-2"></i> Retour
     </a>
-
-    <!-- Ajouter un don -->
-    <a th:href="@{/dons/ajouter}" class="btn btn-custom">
-      + Ajouter un don
-    </a>
   </div>
-
+  <!-- Barres de recherche -->
+  <form th:action="@{/dons-disponibles}" method="get" class="d-flex mb-4 search-bar">
+    <input type="text" name="nomMedicament" placeholder="Nom Médicament" th:value="${nomMedicament}">
+    <input type="text" name="ville" placeholder="Ville" th:value="${ville}">
+    <button type="submit" class="btn btn-custom">Rechercher</button>
+  </form>
+  <div th:if="${error}" th:text="${error}" style="color: red; text-align: center; margin-top: 15px;"></div>
+  <div th:if="${message}" th:text="${message}" style="color: green; text-align: center; margin-top: 15px;"></div>
+  <br>
   <!-- Liste des dons -->
-  <div th:each="don : ${mesDons}" class="post-card">
+  <div th:each="don : ${donsDisponibles}" class="post-card">
+    <!-- Image si disponible -->
     <img th:if="${don.image != null}" th:src="@{'/dons/image/' + ${don.id}}" alt="Image du médicament"/>
 
     <div class="flex-grow-1">
-      <h5 th:text="${don.medicament != null ? don.medicament.nom : 'Non défini'}"></h5>
-      <p><b>Date de péremption :</b>
-        <span th:text="${don.medicament != null ? don.medicament.dateLimite : 'Non définie'}"></span>
-      </p>
-      <p><b>Pharmacie destinataire:</b>
-        <span th:text="${don.pharmacie != null ? don.pharmacie.nomPharmacie + ' - ' + don.pharmacie.nom + ' ' + don.pharmacie.prenom : 'Non définie'}"></span>
-      </p>
-      <p><b>Statut :</b>
-        <span th:text="${don.statut}"></span>
-      </p>
-      <p><b>Description:</b>
-        <span th:text="${don.description != null ? don.description : 'Pas de description'}"></span>
-      </p>
+      <h5 th:text="${don.medicament != null ? don.medicament.nom : 'Nom non défini'}"></h5>
+      <p><b>Pharmacie :</b>
+        <span th:text="${don.pharmacie != null ? don.pharmacie.nomPharmacie : 'Non définie'}"></span></p>
+      <p><b>Ville :</b> <span th:text="${don.pharmacie != null ? don.pharmacie.ville : 'Non définie'}"></span></p>
+      <p><b>Adresse :</b> <span th:text="${don.pharmacie != null ? don.pharmacie.adresse : 'Non définie'}"></span></p>
+      <p><b>Téléphone :</b> <span th:text="${don.pharmacie != null ? don.pharmacie.telephone : 'Non définie'}"></span></p>
     </div>
 
     <div class="d-flex flex-column gap-2">
-      <a th:href="@{'/dons/modifier/' + ${don.id}}" class="btn btn-sm btn-outline-success">Modifier</a>
-      <a th:href="@{'/dons/supprimer/' + ${don.id}}"
-         onclick="return confirm('Supprimer ce don ?')"
-         class="btn btn-sm btn-outline-danger">Supprimer</a>
+      <a th:href="@{'/dons/je-le-veux/' + ${don.id}}" class="btn btn-sm btn-custom">Je le veux</a>
     </div>
   </div>
 </div>
