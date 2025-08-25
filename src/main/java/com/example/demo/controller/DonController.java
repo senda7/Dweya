@@ -5,12 +5,14 @@ import com.example.demo.model.Medicament;
 import com.example.demo.model.StatutDon;
 import com.example.demo.repository.DonRepository;
 import com.example.demo.repository.MedicamentRepository;
+import com.example.demo.repository.UtilisateurRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import com.example.demo.model.Utilisateur;
 
 import java.io.IOException;
 import java.util.List;
@@ -22,17 +24,27 @@ public class DonController {
     private DonRepository donRepository;
 
     @Autowired
+    private UtilisateurRepository utilisateurRepository;
+
+    @Autowired
     private MedicamentRepository medicamentRepository;
+    // Page Espace des Dons
+    @GetMapping("/espace-dons")
+    public String espaceDons(HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) return "redirect:/login";
+
+        return "utilisateur/espace-dons";
+    }
 
     // Liste des dons de l'utilisateur connecté
     @GetMapping("/dons")
     public String listerDons(Model model, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         if(userId == null) return "redirect:/login";
-
-        List<Don> mesDons = donRepository.findByMedicament_Utilisateur_Id(userId);
+        List<Don> mesDons = donRepository.findByMedicament_Utilisateur_IdAndStatut(userId, StatutDon.EN_COURS);
         model.addAttribute("mesDons", mesDons);
-        return "utilisateur/mes-dons"; // ton fichier Thymeleaf
+        return "utilisateur/mes-dons";
     }
 
     // Formulaire d'ajout
@@ -44,6 +56,11 @@ public class DonController {
         List<Medicament> medicaments = medicamentRepository.findByUtilisateurId(userId);
         model.addAttribute("don", new Don());
         model.addAttribute("medicaments", medicaments);
+
+        // Récupérer toutes les pharmacies
+        List<Utilisateur> pharmacies = utilisateurRepository.findByRoleId(3L);
+        model.addAttribute("pharmacies", pharmacies);
+
         return "utilisateur/ajouter-don";
     }
 
@@ -53,21 +70,27 @@ public class DonController {
                              @RequestParam("imageFile") MultipartFile imageFile,
                              HttpSession session) throws IOException {
         Long userId = (Long) session.getAttribute("userId");
-        if(userId == null) return "redirect:/login";
+        if (userId == null) return "redirect:/login";
 
+        // Vérification des médicaments
         Medicament med = medicamentRepository.findById(don.getMedicament().getId()).orElse(null);
-        if(med == null || !med.getUtilisateur().getId().equals(userId)) {
+        if (med == null || !med.getUtilisateur().getId().equals(userId)) {
             return "redirect:/dons";
         }
-
         don.setMedicament(med);
+        //la pharmacie que vous avez choisie dans le formulaire
+        Utilisateur pharmacie = utilisateurRepository.findById(don.getPharmacie().getId()).orElse(null);
+        if (pharmacie == null || pharmacie.getRole().getId() != 3) {
+            return "redirect:/dons";
+        }
+        don.setPharmacie(pharmacie);
         don.setStatut(StatutDon.EN_COURS);
 
-        if(imageFile != null && !imageFile.isEmpty()) {
+        if (imageFile != null && !imageFile.isEmpty()) {
             don.setImage(imageFile.getBytes());
         }
-
         donRepository.save(don);
+
         return "redirect:/dons";
     }
 
@@ -75,16 +98,23 @@ public class DonController {
     @GetMapping("/dons/modifier/{id}")
     public String showEditForm(@PathVariable Long id, Model model, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
-        if(userId == null) return "redirect:/login";
+        if (userId == null) return "redirect:/login";
 
         Don don = donRepository.findById(id).orElse(null);
-        if(don == null || !don.getMedicament().getUtilisateur().getId().equals(userId)) {
+        if (don == null || !don.getMedicament().getUtilisateur().getId().equals(userId)) {
             return "redirect:/dons";
         }
 
+        // récupérer les médicaments de l'utilisateur connecté
         List<Medicament> medicaments = medicamentRepository.findByUtilisateurId(userId);
+        // récupérer les pharmacies (les utilisateurs qui ont le rôle PHARMACIE)
+        List<Utilisateur> pharmacies = utilisateurRepository.findByRoleId(3L);
+        model.addAttribute("pharmacies", pharmacies);
+
         model.addAttribute("don", don);
         model.addAttribute("medicaments", medicaments);
+        model.addAttribute("pharmacies", pharmacies);
+
         return "utilisateur/modifier-don";
     }
 
@@ -93,32 +123,34 @@ public class DonController {
     public String editDon(@ModelAttribute Don don,
                           @RequestParam("imageFile") MultipartFile imageFile,
                           HttpSession session) throws IOException {
-        Long userId = (Long) session.getAttribute("userId");
-        if(userId == null) return "redirect:/login";
 
-        // Récupérer l'objet Don existant
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) return "redirect:/login";
+
         Don donExistant = donRepository.findById(don.getId()).orElse(null);
-        if(donExistant == null || !donExistant.getMedicament().getUtilisateur().getId().equals(userId)) {
+        if (donExistant == null || !donExistant.getMedicament().getUtilisateur().getId().equals(userId)) {
             return "redirect:/dons";
         }
 
-        // Mettre à jour le medicament si changé
+        // update médicament
         Medicament med = medicamentRepository.findById(don.getMedicament().getId()).orElse(null);
-        if(med != null && med.getUtilisateur().getId().equals(userId)) {
+        if (med != null && med.getUtilisateur().getId().equals(userId)) {
             donExistant.setMedicament(med);
         }
 
-        // Mettre à jour l'image si un nouveau fichier est fourni
-        if(imageFile != null && !imageFile.isEmpty()) {
+        // update pharmacie directement depuis l'objet
+        donExistant.setPharmacie(don.getPharmacie());
+        // update description
+        donExistant.setDescription(don.getDescription());
+        // update image
+        if (imageFile != null && !imageFile.isEmpty()) {
             donExistant.setImage(imageFile.getBytes());
         }
-
-        // Optionnel: garder le statut existant ou le mettre à jour si nécessaire
-        // donExistant.setStatut(don.getStatut());
 
         donRepository.save(donExistant);
         return "redirect:/dons";
     }
+
 
     // Supprimer un don
     @GetMapping("/dons/supprimer/{id}")
@@ -133,7 +165,6 @@ public class DonController {
 
         return "redirect:/dons";
     }
-
     // Affichage image
     @GetMapping("/dons/image/{id}")
     @ResponseBody
@@ -144,5 +175,11 @@ public class DonController {
         }
         return new byte[0];
     }
+
+
+
+
+
+
 
 }

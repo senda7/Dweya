@@ -6,9 +6,6 @@ import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.UtilisateurRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -66,8 +63,6 @@ public class LoginController {
         model.addAttribute("roles", roles);
         return "register";
     }
-
-    // --- Traitement inscription ---
     // --- Traitement inscription ---
     @PostMapping("/register")
     public String registerSubmit(
@@ -126,12 +121,13 @@ public class LoginController {
         if ("pharmacie".equals(roleName)) {
             model.addAttribute("message", "Votre compte a été créé avec succès. En attente de validation par l’administrateur.");
             return "login";
+        } else if ("utilisateur".equals(roleName)) {
+            model.addAttribute("message", "Votre compte a été créé avec succès, veuillez vous connecter.");
+            return "login";
         } else {
             return "redirect:/login";
         }
     }
-
-
 
     // --- --------Affichage profil utilisateur ---
     @GetMapping("/profil-utilisateur")
@@ -146,7 +142,19 @@ public class LoginController {
 
         return "utilisateur/profil-utilisateur";
     }
+    // --- --------Affichage profil utilisateur ---
+    @GetMapping("/profil-admin")
+    public String profilAdmin(Model model, HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) return "redirect:/login";
 
+        Utilisateur utilisateur = utilisateurRepository.findById(userId).orElse(null);
+        if (utilisateur == null) return "redirect:/login";
+
+        model.addAttribute("utilisateur", utilisateur);
+
+        return "admin/profil-admin";
+    }
     // --- ---------Affichage profil utilisateur pharma ---
     @GetMapping("/profil-pharmacie")
     public String profilPharmacie(Model model, HttpSession session) {
@@ -160,23 +168,6 @@ public class LoginController {
 
         return "pharmacie/profil-pharmacie"; // vérifie aussi le nom du fichier HTML dans templates
     }
-
-    // --- Endpoint pour afficher la photo de profil ---
-    @GetMapping("/utilisateur/photo/{id}")
-    @ResponseBody
-    public ResponseEntity<byte[]> getPhoto(@PathVariable Long id) {
-        Utilisateur user = utilisateurRepository.findById(id).orElse(null);
-
-        if (user == null || user.getPhotoProfil() == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.IMAGE_PNG); // ⚡ Change en JPEG si nécessaire
-
-        return ResponseEntity.ok().headers(headers).body(user.getPhotoProfil());
-    }
-
     // --- Modification du profil utilisateur ---
     @PostMapping("/utilisateur/modifier")
     public String modifierUtilisateur(@ModelAttribute Utilisateur utilisateurModifie) {
@@ -242,6 +233,9 @@ public class LoginController {
             if (pharmacieModifiee.getAdresse() != null && !pharmacieModifiee.getAdresse().isEmpty()) {
                 ancienne.setAdresse(pharmacieModifiee.getAdresse());
             }
+            if (pharmacieModifiee.getVille() != null && !pharmacieModifiee.getVille().isEmpty()) {
+                ancienne.setVille(pharmacieModifiee.getVille());
+            }
             if (pharmacieModifiee.getTelephone() != null && !pharmacieModifiee.getTelephone().isEmpty()) {
                 ancienne.setTelephone(pharmacieModifiee.getTelephone());
             }
@@ -260,7 +254,7 @@ public class LoginController {
                     ancienne.setAutorisationMinistere(autorisationMinistereFile.getBytes());
                 }
             } catch (IOException e) {
-                e.printStackTrace(); // ou logger.error(...)
+                e.printStackTrace();
             }
 
             utilisateurRepository.save(ancienne);
@@ -299,49 +293,6 @@ public class LoginController {
         utilisateurRepository.save(utilisateur);
 
         return "redirect:/profil-utilisateur?success=Mot de passe changé avec succès";
-    }
-
-
-    // --- Changer photo de profil utilisateur ---
-    @PostMapping("/utilisateur/changer-photo")
-    public String changerPhoto(@RequestParam("photoProfil") MultipartFile photo, HttpSession session) {
-        Long userId = (Long) session.getAttribute("userId");
-        if (userId == null) return "redirect:/login";
-
-        Utilisateur utilisateur = utilisateurRepository.findById(userId).orElse(null);
-        if (utilisateur == null) return "redirect:/login";
-
-        if (photo != null && !photo.isEmpty()) {
-            try {
-                utilisateur.setPhotoProfil(photo.getBytes());
-                utilisateurRepository.save(utilisateur);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return "redirect:/profil-utilisateur?error";
-            }
-        }
-
-        return "redirect:/profil-utilisateur?success";
-    }
-    //----------changer photo de profil pharamacie-----
-    @PostMapping("/pharmacie/changer-photo")
-    public String changerPhotos(@RequestParam("photoProfil") MultipartFile photo, HttpSession session) {
-        Long userId = (Long) session.getAttribute("userId");
-        if (userId == null) return "redirect:/login";
-
-        Utilisateur utilisateur = utilisateurRepository.findById(userId).orElse(null);
-        if (utilisateur == null) return "redirect:/login";
-
-        if (photo != null && !photo.isEmpty()) {
-            try {
-                utilisateur.setPhotoProfil(photo.getBytes());
-                utilisateurRepository.save(utilisateur);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return "redirect:/profil-pharmacie?error";
-            }
-        }
-        return "redirect:/profil-pharmacie?success";
     }
 
     // conditions.html dans templates
@@ -392,10 +343,6 @@ public class LoginController {
             return "redirect:/login";
         }
     }
-
-  //************************************
-
-
 
 
 

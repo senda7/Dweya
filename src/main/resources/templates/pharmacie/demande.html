@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demandes des Dons | Dwaya</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a2e0e6fa41.js" crossorigin="anonymous"></script>
+    <style>
+        :root {
+          --bg-gradient-start: #74ebd5;
+          --bg-gradient-end: #ACB6E5;
+          --container-bg: #ffffff;
+          --primary-color: #1e6b77;
+          --btn-bg: #74ebd5;
+          --btn-hover: #5fc9bb;
+          --text-color: #333;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+          font-family: 'Roboto', sans-serif;
+          background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+          min-height: 100vh;
+        }
+
+        .container {
+          background-color: var(--container-bg);
+          padding: 40px 30px;
+          border-radius: 20px;
+          box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+          width: 100%;
+          max-width: 1000px;
+          margin: 30px auto;
+        }
+
+        .section-title {
+          color: var(--primary-color);
+          font-weight: bold;
+          margin-bottom: 30px;
+          text-align: center;
+        }
+
+        .btn-custom {
+          background-color: var(--btn-bg);
+          color: white;
+          border: none;
+          transition: background-color 0.3s ease;
+          padding: 8px 16px;
+          border-radius: 8px;
+          font-weight: 500;
+        }
+        .btn-custom:hover { background-color: var(--btn-hover); }
+
+        .post-card {
+          border: 1px solid #ddd;
+          border-radius: 15px;
+          padding: 20px;
+          margin-bottom: 20px;
+          background: #f9f9f9;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .search-bar input {
+          border-radius: 10px;
+          border: 1px solid #ccc;
+          padding: 8px 12px;
+          margin-right: 10px;
+          width: 200px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 class="section-title">Demandes des dons</h2>
+
+    <div class="d-flex justify-content-between mb-4">
+        <a th:href="@{/dons-pharmacie}" class="btn btn-custom">
+            <i class="fas fa-arrow-left me-2"></i> Retour
+        </a>
+    </div>
+
+    <!-- Barre de recherche -->
+    <form th:action="@{/demande}" method="get" class="d-flex mb-4 search-bar">
+        <input type="text" name="code_demande" placeholder="Code Demande" th:value="${code_demande}">
+        <button type="submit" class="btn btn-custom">Rechercher</button>
+    </form>
+    <div th:if="${error}" th:text="${error}" style="color: red; text-align: center; margin-top: 15px;"></div>
+    <div th:if="${message}" th:text="${message}" style="color: green; text-align: center; margin-top: 15px;"></div>
+
+    <!-- Liste des demandes -->
+    <div th:each="don : ${demande}" class="post-card">
+        <div class="flex-grow-1">
+            <p><strong>Code Demande :</strong> <span th:text="${don.codeDemande}"></span></p>
+            <p><strong>ID du Don :</strong> <span th:text="${don.id}"></span></p>
+            <p><strong>Nom du Médicament :</strong> <span th:text="${don.medicament != null ? don.medicament.nom : 'N/A'}"></span></p>
+        </div>
+        <div class="d-flex flex-column gap-2">
+            <a th:href="@{'/pharmacie/dons/recu/' + ${don.id}}" class="btn btn-sm btn-success">Dons reçu</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

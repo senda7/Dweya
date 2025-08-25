@@ -159,33 +159,22 @@
     <a th:href="@{/accueil-admin}">Accueil</a>
     <a th:href="@{/admin/utilisateurs}">Utilisateurs</a>
     <a th:href="@{/admin/liste-pharmacies}">Pharmacies</a>
-    <a th:href="@{/admin/dons}">Dons</a>
-    <a th:href="@{/}">Commandes</a>
     <a th:href="@{/profil-admin}">Profil</a>
   </div>
 
-  <!-- Icônes SVG + Déconnexion -->
   <div class="nav-actions">
     <div class="icon-links">
-      <!-- Notification -->
-      <a th:href="@{/notifications}" title="Notifications">
-        <svg viewBox="0 0 24 24"><path d="M12 2C10.34 2 9 3.34 9 5v1.07C6.16
-        6.56 4 8.92 4 12v5l-1 1v1h18v-1l-1-1v-5c0-3.08-2.16-5.44-5-5.93V5c0-1.66-1.34-3-3-3zM12
-        22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2z"/></svg>
-      </a>
-    </div>
-
     <form th:action="@{/logout}" method="post">
       <button type="submit" class="logout-btn">Déconnexion</button>
     </form>
   </div>
-</nav>
+  </div></nav>
 
 <!-- Hero section -->
 <div class="hero">
   <h1>Bienvenue, <span th:text="${utilisateur.prenom}"></span> 👑</h1>
-  <p>Voici votre espace d'administration. Gérez les utilisateurs , les pharmacies ,
-    <br>les dons, les ventes et plus encore.</p>
+  <p>Voici votre espace d'administration. Gérez les utilisateurs et les pharmacies.
+  </p>
 </div>
 </section>
 

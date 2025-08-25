@@ -15,7 +15,7 @@ public class Role {
     private String nom;
 
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
-    @JsonIgnore // باش ما يدورش مع Utilisateur ويعمل StackOverflow
+    @JsonIgnore
     private List<Utilisateur> utilisateurs;
 
     // ======== Constructeur par défaut ========
@@ -58,6 +58,6 @@ public class Role {
                 "id=" + id +
                 ", nom='" + nom + '\'' +
                 '}';
-        // intentionally ما حطيناش utilisateurs باش ما ندخلوش في الحلقة
+
     }
 }
