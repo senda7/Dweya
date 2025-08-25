@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Espace des Dons | Dwaya</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a2e0e6fa41.js" crossorigin="anonymous"></script>
+    <style>
+        :root {
+          --bg-gradient-start: #74ebd5;
+          --bg-gradient-end: #ACB6E5;
+          --container-bg: #ffffff;
+          --primary-color: #1e6b77;
+          --btn-bg: #74ebd5;
+          --btn-hover: #5fc9bb;
+          --text-color: #333;
+        }
+
+        * {
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0;
+        }
+
+        body {
+          font-family: 'Roboto', sans-serif;
+          background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+          min-height: 100vh;
+        }
+
+        /* Navbar */
+        nav {
+          position: sticky;
+          top: 0;
+          z-index: 1000;
+          background-color: #fff;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 15px 40px;
+        }
+
+        .logo-container {
+          display: flex;
+          align-items: center;
+        }
+        .logo {
+          width: 110px;
+          height: 110px;
+          margin-bottom: 10px;
+          animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-8px); }
+        }
+
+        .nav-links a {
+          margin: 0 12px;
+          text-decoration: none;
+          color: var(--text-color);
+          font-weight: 500;
+          transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+          color: var(--btn-hover);
+        }
+
+        .logout-btn {
+          background-color: transparent;
+          border: 2px solid var(--btn-bg);
+          color: var(--btn-bg);
+          padding: 8px 16px;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: 0.3s;
+        }
+
+        .logout-btn:hover {
+          background-color: var(--btn-bg);
+          color: white;
+        }
+
+        /* Contenu */
+        .container {
+          background-color: var(--container-bg);
+          padding: 40px 30px;
+          border-radius: 20px;
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+          width: 100%;
+          max-width: 900px;
+          margin: 30px auto;
+          text-align: center;
+        }
+
+        .section-title {
+          color: var(--primary-color);
+          font-weight: bold;
+          margin-bottom: 30px;
+          text-align: center;
+        }
+
+        .btn-custom {
+          background-color: var(--btn-bg);
+          color: white;
+          border: none;
+          padding: 12px 25px;
+          margin: 10px;
+          border-radius: 10px;
+          font-weight: 500;
+          transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .btn-custom:hover {
+          background-color: var(--btn-hover);
+          transform: translateY(-3px);
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- Navbar identique à la page d'accueil -->
+<nav>
+    <div class="logo-container">
+        <img th:src="@{/logo.png}" alt="Logo Dwaya" class="logo">
+    </div>
+
+    <div class="nav-links">
+        <a th:href="@{/accueil-pharmacie}">Accueil</a>
+        <a th:href="@{/stock}">gestion de stock</a>
+        <a th:href="@{/dons-pharmacie}">gestion des dons</a>
+        <a th:href="@{/commandes}">Commandes</a>
+        <a th:href="@{/profil-pharmacie}">Profil</a>
+    </div>
+
+    <form th:action="@{/logout}" method="post">
+        <button type="submit" class="logout-btn">Déconnexion</button>
+    </form>
+</nav>
+
+<!-- Contenu de la page Dons -->
+<div class="container">
+    <h2 class="section-title">Espace des Dons</h2>
+
+    <div class="d-flex justify-content-center flex-wrap">
+        <a th:href="@{/pharmacie/dons/historique}" class="btn btn-custom"><i class="fas fa-history me-2"></i> Mes Historique</a>
+        <a th:href="@{/demandes-dons}" class="btn btn-custom"><i class="fas fa-hand-holding-heart me-2"></i> Donations</a>
+        <a th:href="@{/demande}" class="btn btn-custom"><i class="fas fa-gift me-2"></i>Demandes des dons</a>
+    </div>
+</div>
+
+</body>
+</html>

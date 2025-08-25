@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "stock")
 public class Medpharmacie {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,21 +19,30 @@ public class Medpharmacie {
 
     private Integer quantite;
 
-    @Lob
-    @Column(name = "photo_data", columnDefinition = "LONGTEXT")
-    private String photoData;
+    @Lob // Annotation importante pour les gros objets
+    @Column(name = "photo_data", columnDefinition = "LONGTEXT") // LONGTEXT pour MySQL
+    private String photoData; // Changé de photoPath à photoData
 
     @Column(name = "ordonnance_requise")
     private boolean ordonnanceRequise;
 
-    // 🔹 Relation avec la pharmacie (Utilisateur)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pharmacie_id", nullable = false)
-    private Utilisateur pharmacie;
+    @Column(name = "pharmacie_id", nullable = false)
+    private Long pharmacieId;
 
+    // Constructeurs
     public Medpharmacie() {}
 
-    // ===== Getters & Setters =====
+    public Medpharmacie(String nom, String description, Double prix, Integer quantite,
+                        boolean ordonnanceRequise, Long pharmacieId) {
+        this.nom = nom;
+        this.description = description;
+        this.prix = prix;
+        this.quantite = quantite;
+        this.ordonnanceRequise = ordonnanceRequise;
+        this.pharmacieId = pharmacieId;
+    }
+
+    // Getters et setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -56,6 +64,6 @@ public class Medpharmacie {
     public boolean isOrdonnanceRequise() { return ordonnanceRequise; }
     public void setOrdonnanceRequise(boolean ordonnanceRequise) { this.ordonnanceRequise = ordonnanceRequise; }
 
-    public Utilisateur getPharmacie() { return pharmacie; }
-    public void setPharmacie(Utilisateur pharmacie) { this.pharmacie = pharmacie; }
+    public Long getPharmacieId() { return pharmacieId; }
+    public void setPharmacieId(Long pharmacieId) { this.pharmacieId = pharmacieId; }
 }

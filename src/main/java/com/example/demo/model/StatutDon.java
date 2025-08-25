@@ -5,6 +5,7 @@ public enum StatutDon {
     ACCEPTE("Accepté"),
     REFUSE("Refusé");
 
+
     private final String label;
 
     StatutDon(String label) { this.label = label; }

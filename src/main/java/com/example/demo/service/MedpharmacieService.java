@@ -1,7 +1,6 @@
 package com.example.demo.service;
 
 import com.example.demo.model.Medpharmacie;
-import com.example.demo.model.Utilisateur;
 import com.example.demo.repository.MedpharmacieRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,28 +14,23 @@ public class MedpharmacieService {
     @Autowired
     private MedpharmacieRepository medpharmacieRepository;
 
-    // 🔹 Tous les médicaments d'une pharmacie
-    public List<Medpharmacie> getMedicamentsByPharmacie(Utilisateur pharmacie) {
-        return medpharmacieRepository.findByPharmacie(pharmacie);
+    public List<Medpharmacie> getMedicamentsByPharmacie(Long pharmacieId) {
+        return medpharmacieRepository.findByPharmacieId(pharmacieId);
     }
 
-    // 🔹 Rechercher par nom dans la pharmacie
-    public List<Medpharmacie> searchMedicamentsByPharmacie(Utilisateur pharmacie, String nom) {
-        return medpharmacieRepository.findByPharmacieAndNomContainingIgnoreCase(pharmacie, nom);
+    public List<Medpharmacie> searchMedicamentsByPharmacie(Long pharmacieId, String nom) {
+        return medpharmacieRepository.findByPharmacieIdAndNomContainingIgnoreCase(pharmacieId, nom);
     }
 
-    // 🔹 Récupérer un médicament par ID et pharmacie
-    public Optional<Medpharmacie> getMedicamentByIdAndPharmacie(Long id, Utilisateur pharmacie) {
-        return medpharmacieRepository.findByIdAndPharmacie(id, pharmacie);
+    public Optional<Medpharmacie> getMedicamentById(Long id) {
+        return medpharmacieRepository.findById(id);
     }
 
-    // 🔹 Ajouter ou modifier un médicament
     public Medpharmacie saveMedicament(Medpharmacie medicament) {
         return medpharmacieRepository.save(medicament);
     }
 
-    // 🔹 Supprimer un médicament
-    public void deleteMedicament(Medpharmacie medicament) {
-        medpharmacieRepository.delete(medicament);
+    public void deleteMedicament(Long id) {
+        medpharmacieRepository.deleteById(id);
     }
 }

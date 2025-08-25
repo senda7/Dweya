@@ -1,27 +1,31 @@
 package com.example.demo.repository;
 
 import com.example.demo.model.Medpharmacie;
-import com.example.demo.model.Utilisateur;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface MedpharmacieRepository extends JpaRepository<Medpharmacie, Long> {
 
-    // 🔹 Tous les médicaments d'une pharmacie
-    List<Medpharmacie> findByPharmacie(Utilisateur pharmacie);
+    // Méthodes de recherche générales
+    List<Medpharmacie> findByNomContainingIgnoreCase(String nom);
+    List<Medpharmacie> findByQuantiteLessThan(int quantite);
+    List<Medpharmacie> findByOrdonnanceRequise(boolean ordonnanceRequise);
 
-    // 🔹 Rechercher par nom dans une pharmacie
-    List<Medpharmacie> findByPharmacieAndNomContainingIgnoreCase(Utilisateur pharmacie, String nom);
+    // Méthodes de recherche par pharmacie
+    List<Medpharmacie> findByPharmacieId(Long pharmacieId);
+    List<Medpharmacie> findByPharmacieIdAndNomContainingIgnoreCase(Long pharmacieId, String nom);
+    List<Medpharmacie> findByPharmacieIdAndQuantiteLessThan(Long pharmacieId, int quantite);
+    List<Medpharmacie> findByPharmacieIdAndOrdonnanceRequise(Long pharmacieId, boolean ordonnanceRequise);
 
-    // 🔹 Récupérer un médicament par ID et pharmacie
-    Optional<Medpharmacie> findByIdAndPharmacie(Long id, Utilisateur pharmacie);
+    // Méthodes de comptage générales
+    long countByQuantiteLessThan(int quantite);
+    long countByOrdonnanceRequise(boolean ordonnanceRequise);
 
-    // 🔹 Statistiques
-    long countByPharmacie(Utilisateur pharmacie);
-    long countByPharmacieAndQuantiteLessThan(Utilisateur pharmacie, int quantite);
-    long countByPharmacieAndOrdonnanceRequise(Utilisateur pharmacie, boolean ordonnanceRequise);
+    // Méthodes de comptage par pharmacie
+    long countByPharmacieId(Long pharmacieId);
+    long countByPharmacieIdAndQuantiteLessThan(Long pharmacieId, int quantite);
+    long countByPharmacieIdAndOrdonnanceRequise(Long pharmacieId, boolean ordonnanceRequise);
 }

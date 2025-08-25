@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion de stock</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- Intégration de SweetAlert2 -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestion de stock - Dwaya</title>
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+
+    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
         :root {
           --bg-gradient-start: #74ebd5;
@@ -19,6 +23,8 @@
           --btn-hover: #5fc9bb;
           --btn-edit: #ffc107;
           --btn-delete: #dc3545;
+          --text-color: #333;
+          --turquoise: #74ebd5;
         }
 
         body {
@@ -26,8 +32,36 @@
           font-family: 'Roboto', sans-serif;
           background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
           min-height: 100vh;
-          padding: 2rem 1rem;
         }
+
+        /* ===== Navbar (même en-tête que la page Profil) ===== */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+        }
+        .logo-container { display: flex; align-items: center; }
+        .logo { width: 110px; height: 110px; margin-bottom: 10px; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0);} 50% { transform: translateY(-8px);} }
+        .nav-links a {
+            margin: 0 12px; text-decoration: none; color: var(--text-color);
+            font-weight: 500; transition: color 0.3s;
+        }
+        .nav-links a:hover { color: var(--btn-hover); }
+        .logout-btn {
+            background-color: transparent; border: 2px solid var(--btn-bg);
+            color: var(--btn-bg); padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: 0.3s;
+        }
+        .logout-btn:hover { background-color: var(--btn-bg); color: #fff; }
+
+        /* ===== Page content ===== */
+        .page-wrap { padding: 24px 16px 40px; }
 
         .main-container {
           background-color: var(--container-bg);
@@ -38,12 +72,7 @@
           margin: 0 auto;
         }
 
-        h1 {
-          color: var(--primary-color);
-          font-weight: 600;
-          margin-bottom: 1.5rem;
-          text-align: center;
-        }
+        h1 { color: var(--primary-color); font-weight: 600; margin-bottom: 1.5rem; text-align: center; }
 
         .btn-add {
           background-color: var(--btn-bg);
@@ -53,230 +82,163 @@
           font-weight: 500;
           text-decoration: none;
           display: inline-block;
-        }
-
-        .btn-add:hover {
-          background-color: var(--btn-hover);
-          color: white;
-        }
-
-        .btn-edit {
-          background-color: var(--btn-edit);
-          border: none;
           color: #000;
-          font-weight: 500;
         }
+        .btn-add:hover { background-color: var(--btn-hover); color: #fff; }
 
-        .btn-delete {
-          background-color: var(--btn-delete);
-          border: none;
-          color: white;
-          font-weight: 500;
-        }
+        .btn-edit { background-color: var(--btn-edit); border: none; color: #000; font-weight: 500; }
+        .btn-delete { background-color: var(--btn-delete); border: none; color: #fff; font-weight: 500; }
 
-        .table-responsive {
-          border-radius: 0.75rem;
-          overflow: hidden;
-          box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-        }
+        .table-responsive { border-radius: 0.75rem; overflow: hidden; box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075); }
+        .table thead { background-color: var(--primary-color); color: #fff; }
+        .table th { font-weight: 500; padding: 1rem; vertical-align: middle; }
+        .table td { padding: 0.75rem; vertical-align: middle; }
+        .table tbody tr:hover { background-color: rgba(116, 235, 213, 0.1); }
 
-        .table thead {
-          background-color: var(--primary-color);
-          color: white;
-        }
+        .badge { font-size: 0.85em; padding: 0.5em 0.75em; }
 
-        .table th {
-          font-weight: 500;
-          padding: 1rem;
-          vertical-align: middle;
-        }
+        .medicament-photo-container { width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa; border-radius: 0.5rem; }
+        .medicament-photo { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 0.25rem; }
+        .no-photo { color: #6c757d; font-style: italic; font-size: 0.9rem; }
 
-        .table td {
-          padding: 0.75rem;
-          vertical-align: middle;
-        }
+        .search-container { position: relative; max-width: 300px; }
+        .search-container i { position: absolute; left: 12px; top: 10px; color: #6c757d; }
+        .search-container input { padding-left: 35px; }
 
-        .table tbody tr:hover {
-          background-color: rgba(116, 235, 213, 0.1);
-        }
+        .empty-state { text-align: center; padding: 3rem; color: #6c757d; }
+        .empty-state i { font-size: 4rem; margin-bottom: 1rem; color: #ced4da; }
 
-        .badge {
-          font-size: 0.85em;
-          padding: 0.5em 0.75em;
-        }
-
-        .medicament-photo-container {
-          width: 80px;
-          height: 80px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background-color: #f8f9fa;
-          border-radius: 0.5rem;
-        }
-
-        .medicament-photo {
-          max-width: 100%;
-          max-height: 100%;
-          object-fit: contain;
-          border-radius: 0.25rem;
-        }
-
-        .no-photo {
-          color: #6c757d;
-          font-style: italic;
-          font-size: 0.9rem;
-        }
-
-        .search-container {
-          position: relative;
-          max-width: 300px;
-        }
-
-        .search-container i {
-          position: absolute;
-          left: 12px;
-          top: 10px;
-          color: #6c757d;
-        }
-
-        .search-container input {
-          padding-left: 35px;
-        }
-
-        .empty-state {
-          text-align: center;
-          padding: 3rem;
-          color: #6c757d;
-        }
-
-        .empty-state i {
-          font-size: 4rem;
-          margin-bottom: 1rem;
-          color: #ced4da;
-        }
-
-        .low-stock {
-          color: #dc3545;
-          font-weight: bold;
-        }
+        .low-stock { color: #dc3545; font-weight: bold; }
 
         @media (max-width: 768px) {
-          .main-container {
-            padding: 1rem;
-          }
-
-          .table-responsive {
-            overflow-x: auto;
-          }
+          .page-wrap { padding: 12px 8px 24px; }
+          .main-container { padding: 1rem; }
+          .table-responsive { overflow-x: auto; }
         }
     </style>
 </head>
 <body>
-<div class="main-container">
-    <h1>Gestion de stock</h1>
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <a th:href="@{/stock/ajouter}" class="btn btn-add">
-            <i class="fas fa-plus me-2" aria-hidden="true"></i>Ajouter un médicament
-        </a>
-        <div class="text-muted">Total : <span th:text="${totalMedicaments}">0</span> médicaments</div>
+<!-- ===== Navbar (identique au profil) ===== -->
+<nav>
+    <div class="logo-container">
+        <img th:src="@{/logo.png}" alt="Logo Dwaya" class="logo" />
     </div>
+    <div class="nav-links">
+        <a th:href="@{/accueil-pharmacie}">Accueil</a>
+        <a th:href="@{/stock}">Gestion de stock</a>
+        <a th:href="@{/dons-pharmacie}">Gestion des dons</a>
+        <a th:href="@{/commandes}">Commandes</a>
+        <a th:href="@{/profil-pharmacie}">Profil</a>
+    </div>
+    <form th:action="@{/logout}" method="post">
+        <button type="submit" class="logout-btn">Déconnexion</button>
+    </form>
+</nav>
 
-    <!-- Actions and Search -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <div class="search-container">
-            <i class="fas fa-search"></i>
-            <input type="text" class="form-control" placeholder="Rechercher..." id="searchInput">
+<div class="page-wrap">
+    <div class="main-container">
+        <h1>Gestion de stock</h1>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <a th:href="@{/stock/ajouter}" class="btn btn-add">
+                <i class="fas fa-plus me-2" aria-hidden="true"></i>Ajouter un médicament
+            </a>
+            <div class="text-muted">Total : <span th:text="${totalMedicaments}">0</span> médicaments</div>
         </div>
-    </div>
 
-    <div class="table-responsive">
-        <table class="table table-striped table-hover align-middle">
-            <thead class="align-middle">
-            <tr>
-                <th>ID</th>
-                <th>Photo</th>
-                <th>Nom</th>
-                <th>Prix</th>
-                <th>Quantité</th>
-                <th>Description</th>
-                <th>Ordonnance</th>
-                <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            <!-- Affichage des médicaments -->
-            <tr th:each="medicament : ${medicaments}">
-                <td th:text="${medicament.id}"></td>
-                <td>
-                    <div class="medicament-photo-container">
-                        <img th:if="${medicament.photoData}"
-                             th:src="${medicament.photoData}"
-                             class="medicament-photo"
-                             alt="Photo médicament"
-                             onerror="this.style.display='none';">
-                        <span th:unless="${medicament.photoData}" class="no-photo">
-                            <i class="fas fa-pills"></i>
-                        </span>
-                    </div>
-                </td>
-                <td th:text="${medicament.nom}"></td>
-                <td th:text="${#numbers.formatDecimal(medicament.prix, 1, 2) + ' dt'}"></td>
-                <td>
-                    <span th:class="${medicament.quantite < 10} ? 'low-stock' : ''"
-                          th:text="${medicament.quantite}"></span>
-                </td>
-                <td>
-                    <span th:if="${medicament.description}" th:text="${medicament.description}"></span>
-                    <span th:unless="${medicament.description}" class="text-muted">-</span>
-                </td>
-                <td>
-                    <span th:if="${medicament.ordonnanceRequise}" class="badge bg-danger">Oui</span>
-                    <span th:unless="${medicament.ordonnanceRequise}" class="badge bg-success">Non</span>
-                </td>
-                <td>
-                    <div class="btn-group">
-                        <a th:href="@{/stock/modifier/{id}(id=${medicament.id})}"
-                           class="btn btn-warning btn-sm">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <a th:href="@{/stock/supprimer/{id}(id=${medicament.id})}"
-                           class="btn btn-danger btn-sm delete-btn"
-                           data-id="${medicament.id}"
-                           data-nom="${medicament.nom}">
-                            <i class="fas fa-trash"></i>
-                        </a>
-                    </div>
-                </td>
-            </tr>
+        <!-- Recherche -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="search-container">
+                <i class="fas fa-search"></i>
+                <input type="text" class="form-control" placeholder="Rechercher..." id="searchInput" />
+            </div>
+        </div>
 
-            <!-- Message si aucun médicament -->
-            <tr th:if="${#lists.isEmpty(medicaments)}">
-                <td colspan="8">
-                    <div class="empty-state">
-                        <i class="fas fa-box-open"></i>
-                        <h4>Aucun médicament en stock</h4>
-                        <p>Commencez par ajouter votre premier médicament</p>
-                        <a th:href="@{/stock/ajouter}" class="btn btn-add mt-3">
-                            <i class="fas fa-plus me-2" aria-hidden="true"></i>Ajouter un médicament
-                        </a>
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="align-middle">
+                <tr>
+                    <th>ID</th>
+                    <th>Photo</th>
+                    <th>Nom</th>
+                    <th>Prix</th>
+                    <th>Quantité</th>
+                    <th>Description</th>
+                    <th>Ordonnance</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Liste des médicaments -->
+                <tr th:each="medicament : ${medicaments}">
+                    <td th:text="${medicament.id}"></td>
+                    <td>
+                        <div class="medicament-photo-container">
+                            <img th:if="${medicament.photoData}"
+                                 th:src="${medicament.photoData}"
+                                 class="medicament-photo"
+                                 alt="Photo médicament"
+                                 onerror="this.style.display='none';" />
+                            <span th:unless="${medicament.photoData}" class="no-photo">
+                              <i class="fas fa-pills"></i>
+                          </span>
+                        </div>
+                    </td>
+                    <td th:text="${medicament.nom}"></td>
+                    <td th:text="${#numbers.formatDecimal(medicament.prix, 1, 2)} + ' dt'"></td>
+                    <td>
+                      <span th:class="${medicament.quantite} < 10 ? 'low-stock' : ''"
+                            th:text="${medicament.quantite}"></span>
+                    </td>
+                    <td>
+                        <span th:if="${medicament.description}" th:text="${medicament.description}"></span>
+                        <span th:unless="${medicament.description}" class="text-muted">-</span>
+                    </td>
+                    <td>
+                        <span th:if="${medicament.ordonnanceRequise}" class="badge bg-danger">Oui</span>
+                        <span th:unless="${medicament.ordonnanceRequise}" class="badge bg-success">Non</span>
+                    </td>
+                    <td>
+                        <div class="btn-group">
+
+                            <button class="btn btn-sm btn-outline-success"><a th:href="@{/stock/modifier/{id}(id=${medicament.id})}">Modifier</a></button>
+                            <button class="btn btn-sm btn-outline-danger"> <a th:href="@{/stock/supprimer/{id}(id=${medicament.id})}"
+                                                                              th:attr="data-id=${medicament.id},data-nom=${medicament.nom}"></a>Supprimer</a></button>
+
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- Etat vide -->
+                <tr th:if="${#lists.isEmpty(medicaments)}">
+                    <td colspan="8">
+                        <div class="empty-state">
+                            <i class="fas fa-box-open"></i>
+                            <h4>Aucun médicament en stock</h4>
+                            <p>Commencez par ajouter votre premier médicament</p>
+                            <a th:href="@{/stock/ajouter}" class="btn btn-add mt-3">
+                                <i class="fas fa-plus me-2" aria-hidden="true"></i>Ajouter un médicament
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
-
+<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Fonctionnalité de recherche
+        // ===== Recherche avec debounce =====
         const searchInput = document.getElementById('searchInput');
         let searchTimer;
+        // Préremplir si ?nom= existe
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchTerm = urlParams.get('nom');
+        if (searchTerm) { searchInput.value = searchTerm; }
 
         searchInput.addEventListener('keyup', function() {
             clearTimeout(searchTimer);
@@ -287,36 +249,26 @@
             }, 500);
         });
 
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const searchTerm = urlParams.get('nom');
-        if (searchTerm) {
-            searchInput.value = searchTerm;
-        }
-
+        // ===== Confirmation suppression =====
         const deleteButtons = document.querySelectorAll('.delete-btn');
-
         deleteButtons.forEach(button => {
             button.addEventListener('click', function(e) {
                 e.preventDefault();
-
-                const medicamentId = this.getAttribute('data-id');
-                const medicamentNom = this.getAttribute('data-nom');
                 const deleteUrl = this.getAttribute('href');
+                const medicamentNom = this.getAttribute('data-nom') || '';
 
                 Swal.fire({
-                    title: 'Êtes-vous sûr?',
-                    html: `Vous allez supprimer le médicament <strong>`,
+                    title: 'Êtes-vous sûr ?',
+                    html: `Vous allez supprimer le médicament <strong>${medicamentNom}</strong>. Cette action est irréversible.`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
                     cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Oui, supprimer!',
+                    confirmButtonText: 'Oui, supprimer !',
                     cancelButtonText: 'Annuler',
                     reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Redirection vers l'URL de suppression
                         window.location.href = deleteUrl;
                     }
                 });
