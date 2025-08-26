@@ -1,3 +1,4 @@
+
 package com.example.demo.repository;
 
 import com.example.demo.model.Utilisateur;
@@ -22,4 +23,3 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateur, Long> 
     //pour la recuperation de compte par role
     List<Utilisateur> findByRoleId(Long roleId);
 }
-

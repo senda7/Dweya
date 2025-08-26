@@ -1,7 +1,9 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.Medpharmacie;
+import com.example.demo.model.Utilisateur;
 import com.example.demo.service.MedpharmacieService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,110 +23,105 @@ public class StockController {
     @Autowired
     private MedpharmacieService medpharmacieService;
 
-    // Méthode pour obtenir l'ID de la pharmacie (version temporaire)
-    private Long getPharmacieId() {
-        // TEMPORAIRE: Retourne un ID fixe pour le développement
-        // À REMPLACER par votre logique d'authentification réelle
-        return 1L;
+    // ===== Récupérer l'ID pharmacie depuis la session =====
+    private Long getPharmacieId(HttpSession session) {
+        Utilisateur utilisateur = (Utilisateur) session.getAttribute("utilisateurConnecte");
+        if (utilisateur != null && utilisateur.getTypeUtilisateur() == Utilisateur.TypeUtilisateur.PHARMACIE) {
+            return utilisateur.getId();
+        }
+        return null;
     }
 
-    // Page principale de gestion du stock
+    // ===== Page principale de gestion du stock =====
     @GetMapping
-    public String afficherGestionStock(Model model) {
-        Long pharmacieId = getPharmacieId();
-        List<Medpharmacie> medicaments = medpharmacieService.getMedicamentsByPharmacie(pharmacieId);
+    public String afficherGestionStock(HttpSession session, Model model) {
+        Long pharmacieId = getPharmacieId(session);
+        if (pharmacieId == null) return "redirect:/login";
 
+        List<Medpharmacie> medicaments = medpharmacieService.getMedicamentsByPharmacie(pharmacieId);
         model.addAttribute("medicaments", medicaments);
         model.addAttribute("totalMedicaments", medicaments != null ? medicaments.size() : 0);
         return "pharmacie/gestion-stock";
     }
 
-    // Afficher le formulaire d'ajout
+    // ===== Afficher le formulaire d'ajout =====
     @GetMapping("/ajouter")
-    public String afficherFormulaireAjout(Model model) {
+    public String afficherFormulaireAjout(HttpSession session, Model model) {
+        Long pharmacieId = getPharmacieId(session);
+        if (pharmacieId == null) return "redirect:/login";
+
         Medpharmacie medicament = new Medpharmacie();
-        medicament.setPharmacieId(getPharmacieId()); // Définir l'ID pharmacie
+        medicament.setPharmacieId(pharmacieId);
         model.addAttribute("medicament", medicament);
         return "pharmacie/ajouter";
     }
 
-    // Traiter l'ajout d'un médicament
+    // ===== Ajouter un médicament =====
     @PostMapping("/ajouter")
     public String ajouterMedicament(@ModelAttribute Medpharmacie medicament,
                                     @RequestParam("photo") MultipartFile file,
+                                    HttpSession session,
                                     RedirectAttributes redirectAttributes) {
         try {
-            // Validation basique
+            Long pharmacieId = getPharmacieId(session);
+            if (pharmacieId == null) return "redirect:/login";
+
             if (file.isEmpty()) {
                 redirectAttributes.addFlashAttribute("error", "Veuillez sélectionner une photo");
                 return "redirect:/stock/ajouter";
             }
 
-            // Vérifier la taille du fichier (max 5MB)
             if (file.getSize() > 5 * 1024 * 1024) {
                 redirectAttributes.addFlashAttribute("error", "La photo ne doit pas dépasser 5MB");
                 return "redirect:/stock/ajouter";
             }
 
-            // Vérifier le type de fichier
             String contentType = file.getContentType();
             if (contentType == null || !contentType.startsWith("image/")) {
                 redirectAttributes.addFlashAttribute("error", "Veuillez sélectionner une image valide");
                 return "redirect:/stock/ajouter";
             }
 
-            // Convertir l'image en Base64 et l'enregistrer
-            String imageData = convertToBase64(file);
-            medicament.setPhotoData(imageData);
-            medicament.setPharmacieId(getPharmacieId());
-
-            // Sauvegarder le médicament
+            medicament.setPhotoData(convertToBase64(file));
+            medicament.setPharmacieId(pharmacieId);
             medpharmacieService.saveMedicament(medicament);
-
             redirectAttributes.addFlashAttribute("success", "Médicament ajouté avec succès!");
-
         } catch (IOException e) {
             redirectAttributes.addFlashAttribute("error", "Erreur lors du traitement de l'image: " + e.getMessage());
-            return "redirect:/stock/ajouter";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Erreur lors de l'ajout: " + e.getMessage());
-            return "redirect:/stock/ajouter";
         }
 
         return "redirect:/stock";
     }
 
-    // Afficher le formulaire de modification
+    // ===== Afficher le formulaire de modification =====
     @GetMapping("/modifier/{id}")
-    public String afficherFormulaireModification(@PathVariable Long id, Model model) {
-        Long pharmacieId = getPharmacieId();
-        Optional<Medpharmacie> medicamentOptional = medpharmacieService.getMedicamentById(id);
+    public String afficherFormulaireModification(@PathVariable Long id, HttpSession session, Model model) {
+        Long pharmacieId = getPharmacieId(session);
+        if (pharmacieId == null) return "redirect:/login";
 
-        if (medicamentOptional.isEmpty()) {
-            return "redirect:/stock";
-        }
+        Optional<Medpharmacie> medicamentOptional = medpharmacieService.getMedicamentById(id);
+        if (medicamentOptional.isEmpty()) return "redirect:/stock";
 
         Medpharmacie medicament = medicamentOptional.get();
-
-        // Vérifier que le médicament appartient à la pharmacie
-        if (!medicament.getPharmacieId().equals(pharmacieId)) {
-            return "redirect:/stock";
-        }
+        if (!medicament.getPharmacieId().equals(pharmacieId)) return "redirect:/stock";
 
         model.addAttribute("medicament", medicament);
         return "pharmacie/modifier";
     }
 
-    // Traiter la modification d'un médicament
+    // ===== Modifier un médicament =====
     @PostMapping("/modifier/{id}")
     public String modifierMedicament(@PathVariable Long id,
                                      @ModelAttribute Medpharmacie medicament,
                                      @RequestParam(value = "photo", required = false) MultipartFile file,
+                                     HttpSession session,
                                      RedirectAttributes redirectAttributes) {
         try {
-            Long pharmacieId = getPharmacieId();
+            Long pharmacieId = getPharmacieId(session);
+            if (pharmacieId == null) return "redirect:/login";
 
-            // Récupérer le médicament existant
             Optional<Medpharmacie> existingMedicamentOptional = medpharmacieService.getMedicamentById(id);
             if (existingMedicamentOptional.isEmpty()) {
                 redirectAttributes.addFlashAttribute("error", "Médicament non trouvé");
@@ -132,77 +129,60 @@ public class StockController {
             }
 
             Medpharmacie existingMedicament = existingMedicamentOptional.get();
-
-            // Vérifier les permissions
             if (!existingMedicament.getPharmacieId().equals(pharmacieId)) {
                 redirectAttributes.addFlashAttribute("error", "Accès non autorisé");
                 return "redirect:/stock";
             }
 
-            // Gestion de la photo
             if (file != null && !file.isEmpty()) {
-                // Validation de la nouvelle photo
                 if (file.getSize() > 5 * 1024 * 1024) {
                     redirectAttributes.addFlashAttribute("error", "La photo ne doit pas dépasser 5MB");
                     return "redirect:/stock/modifier/" + id;
                 }
-
                 String contentType = file.getContentType();
                 if (contentType == null || !contentType.startsWith("image/")) {
                     redirectAttributes.addFlashAttribute("error", "Veuillez sélectionner une image valide");
                     return "redirect:/stock/modifier/" + id;
                 }
-
-                // Convertir et enregistrer la nouvelle photo
-                String imageData = convertToBase64(file);
-                medicament.setPhotoData(imageData);
+                medicament.setPhotoData(convertToBase64(file));
             } else {
-                // Conserver l'ancienne photo
                 medicament.setPhotoData(existingMedicament.getPhotoData());
             }
 
-            // Mettre à jour le médicament
             medicament.setId(id);
             medicament.setPharmacieId(pharmacieId);
             medpharmacieService.saveMedicament(medicament);
-
             redirectAttributes.addFlashAttribute("success", "Médicament modifié avec succès!");
-
         } catch (IOException e) {
             redirectAttributes.addFlashAttribute("error", "Erreur lors du traitement de l'image: " + e.getMessage());
-            return "redirect:/stock/modifier/" + id;
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Erreur lors de la modification: " + e.getMessage());
-            return "redirect:/stock/modifier/" + id;
         }
 
         return "redirect:/stock";
     }
 
-    // Supprimer un médicament
+    // ===== Supprimer un médicament =====
     @GetMapping("/supprimer/{id}")
-    public String supprimerMedicament(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String supprimerMedicament(@PathVariable Long id, HttpSession session, RedirectAttributes redirectAttributes) {
         try {
-            Long pharmacieId = getPharmacieId();
-            Optional<Medpharmacie> medicamentOptional = medpharmacieService.getMedicamentById(id);
+            Long pharmacieId = getPharmacieId(session);
+            if (pharmacieId == null) return "redirect:/login";
 
+            Optional<Medpharmacie> medicamentOptional = medpharmacieService.getMedicamentById(id);
             if (medicamentOptional.isEmpty()) {
                 redirectAttributes.addFlashAttribute("error", "Médicament non trouvé");
                 return "redirect:/stock";
             }
 
             Medpharmacie medicament = medicamentOptional.get();
-
-            // Vérifier les permissions
             if (!medicament.getPharmacieId().equals(pharmacieId)) {
                 redirectAttributes.addFlashAttribute("error", "Accès non autorisé");
                 return "redirect:/stock";
             }
 
-            // Supprimer le médicament (la photo sera automatiquement supprimée avec lui)
             medpharmacieService.deleteMedicament(id);
             redirectAttributes.addFlashAttribute("success", "Médicament supprimé avec succès!");
-
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Erreur lors de la suppression: " + e.getMessage());
         }
@@ -210,12 +190,13 @@ public class StockController {
         return "redirect:/stock";
     }
 
-    // Rechercher des médicaments
+    // ===== Rechercher des médicaments =====
     @GetMapping("/rechercher")
-    public String rechercherMedicaments(@RequestParam String nom, Model model) {
-        Long pharmacieId = getPharmacieId();
-        List<Medpharmacie> medicaments = medpharmacieService.searchMedicamentsByPharmacie(pharmacieId, nom);
+    public String rechercherMedicaments(@RequestParam String nom, HttpSession session, Model model) {
+        Long pharmacieId = getPharmacieId(session);
+        if (pharmacieId == null) return "redirect:/login";
 
+        List<Medpharmacie> medicaments = medpharmacieService.searchMedicamentsByPharmacie(pharmacieId, nom);
         model.addAttribute("medicaments", medicaments);
         model.addAttribute("totalMedicaments", medicaments != null ? medicaments.size() : 0);
         model.addAttribute("termerecherche", nom);
@@ -223,16 +204,12 @@ public class StockController {
         return "pharmacie/gestion-stock";
     }
 
-    // Méthode utilitaire pour convertir une image en Base64
+    // ===== Convertir une image en Base64 =====
     private String convertToBase64(MultipartFile file) throws IOException {
-        if (file == null || file.isEmpty()) {
-            return null;
-        }
+        if (file == null || file.isEmpty()) return null;
 
         String mimeType = file.getContentType();
-        if (mimeType == null) {
-            mimeType = "image/jpeg"; // Type par défaut
-        }
+        if (mimeType == null) mimeType = "image/jpeg";
 
         byte[] bytes = file.getBytes();
         String base64Image = Base64.getEncoder().encodeToString(bytes);

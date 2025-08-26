@@ -119,23 +119,22 @@
 <div class="container">
   <img th:src="@{/logo.png}" alt="Logo Dwaya" class="logo">
 
-
   <h2 style="color: var(--text-color);">Connexion</h2>
-  <form th:action="@{/login}" th:object="${utilisateur}" method="post">
+  <form th:action="@{/login}" method="post">
     <label for="email">Email :</label>
-    <input type="email" id="email" th:field="*{email}" required />
+    <input type="email" id="email" name="email" required />
 
     <label for="motDePasse">Mot de passe :</label>
-    <input type="password" id="motDePasse" th:field="*{motDePasse}" required />
+    <input type="password" id="motDePasse" name="motDePasse" required />
+
     <button type="submit" class="btn">Se connecter</button>
   </form>
 
   <a class="link" href="/forgot-password">Informations de compte oubliées ?</a>
   <a class="link" href="/register">Créer un nouveau compte</a>
 
-  <div th:if="${error}" th:text="${error}" style="color: red; text-align: center; margin-top: 15px;"></div>
-  <div th:if="${message}" th:text="${message}" style="color: green; text-align: center; margin-top: 15px;"></div>
-
+  <div th:if="${error}" class="error" th:text="${error}"></div>
+  <div th:if="${message}" style="color: green; text-align: center; margin-top: 15px;" th:text="${message}"></div>
 </div>
 </body>
 </html>

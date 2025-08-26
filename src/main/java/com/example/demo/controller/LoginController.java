@@ -4,14 +4,15 @@ import com.example.demo.model.Role;
 import com.example.demo.model.Utilisateur;
 import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.UtilisateurRepository;
+import com.example.demo.service.AuthService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 
@@ -19,58 +20,78 @@ import java.io.IOException;
 public class LoginController {
 
     @Autowired
+    private AuthService authService;
+
+    @Autowired
     private UtilisateurRepository utilisateurRepository;
 
     @Autowired
     private RoleRepository roleRepository;
 
-    // --- Affichage page login ---
+    // ======= PAGE LOGIN =======
     @GetMapping("/login")
-    public String loginForm(Model model) {
+    public String loginPage(Model model) {
         model.addAttribute("utilisateur", new Utilisateur());
         return "login";
     }
 
-    // --- Traitement login ---
+    // ======= TRAITEMENT LOGIN =======
     @PostMapping("/login")
-    public String loginSubmit(@ModelAttribute Utilisateur utilisateur, Model model, HttpSession session) {
-        Utilisateur u = utilisateurRepository.findByEmailAndMotDePasse(utilisateur.getEmail(), utilisateur.getMotDePasse());
+    public String loginSubmit(@RequestParam(required = false) String email,
+                              @RequestParam(required = false) String motDePasse,
+                              @ModelAttribute Utilisateur utilisateur,
+                              Model model,
+                              HttpSession session,
+                              RedirectAttributes redirectAttributes) {
+
+        Utilisateur u = null;
+
+        if (email != null && motDePasse != null) {
+            // Login via AuthService
+            u = authService.login(email, motDePasse);
+        } else if (utilisateur.getEmail() != null && utilisateur.getMotDePasse() != null) {
+            // Login via repository
+            u = utilisateurRepository.findByEmailAndMotDePasse(utilisateur.getEmail(), utilisateur.getMotDePasse());
+        }
 
         if (u != null && u.isEtat()) {
             session.setAttribute("userId", u.getId());
             session.setAttribute("role", u.getRole().getNom());
+            session.setAttribute("utilisateurConnecte", u);
 
             switch (u.getTypeUtilisateur()) {
-                case ADMIN:
-                    return "redirect:/accueil-admin";
-                case PHARMACIE:
-                    return "redirect:/accueil-pharmacie";
+                case ADMIN: return "redirect:/accueil-admin";
+                case PHARMACIE: return "redirect:/accueil-pharmacie";
                 case UTILISATEUR:
-                default:
-                    return "redirect:/accueil-utilisateur";
+                default: return "redirect:/accueil-utilisateur";
             }
         } else {
-            model.addAttribute("error", "Email ou mot de passe incorrect, ou compte inactif");
-            return "login";
+            redirectAttributes.addFlashAttribute("error", "Email ou mot de passe incorrect ou compte inactif !");
+            return "redirect:/login";
         }
     }
 
-    // --- Page register ---
+    // ======= LOGOUT =======
+    @PostMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate();
+        return "redirect:/login";
+    }
+
+    // ======= REGISTER =======
     @GetMapping("/register")
     public String registerForm(Model model) {
-        var roles = roleRepository.findAll();
         model.addAttribute("utilisateur", new Utilisateur());
-        model.addAttribute("roles", roles);
+        model.addAttribute("roles", roleRepository.findAll());
         return "register";
     }
-    // --- Traitement inscription ---
+
     @PostMapping("/register")
     public String registerSubmit(
             @ModelAttribute Utilisateur utilisateur,
             @RequestParam(value = "roleId", required = false) Long roleId,
             Model model
     ) {
-        // Vérification du rôle
         if (roleId == null) {
             model.addAttribute("erreur", "Veuillez sélectionner un rôle.");
             model.addAttribute("roles", roleRepository.findAll());
@@ -90,9 +111,8 @@ public class LoginController {
         try {
             if ("pharmacie".equals(roleName)) {
                 utilisateur.setTypeUtilisateur(Utilisateur.TypeUtilisateur.PHARMACIE);
-                utilisateur.setEtat(false); // compte en attente de validation
+                utilisateur.setEtat(false);
 
-                // Conversion des fichiers MultipartFile en byte[]
                 if (utilisateur.getRegistreCommerceFile() != null && !utilisateur.getRegistreCommerceFile().isEmpty()) {
                     utilisateur.setRegistreCommerce(utilisateur.getRegistreCommerceFile().getBytes());
                 }
@@ -103,9 +123,8 @@ public class LoginController {
                     utilisateur.setAutorisationMinistere(utilisateur.getAutorisationMinistereFile().getBytes());
                 }
             } else {
-                // Utilisateur classique ou autre rôle
                 utilisateur.setTypeUtilisateur(Utilisateur.TypeUtilisateur.UTILISATEUR);
-                utilisateur.setEtat(true); // compte actif directement
+                utilisateur.setEtat(true);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -114,236 +133,64 @@ public class LoginController {
             return "register";
         }
 
-        // Sauvegarde de l'utilisateur
         utilisateurRepository.save(utilisateur);
 
-        // Redirection ou message selon le rôle
         if ("pharmacie".equals(roleName)) {
-            model.addAttribute("message", "Votre compte a été créé avec succès. En attente de validation par l’administrateur.");
-            return "login";
-        } else if ("utilisateur".equals(roleName)) {
-            model.addAttribute("message", "Votre compte a été créé avec succès, veuillez vous connecter.");
-            return "login";
+            model.addAttribute("message", "Votre compte a été créé. En attente de validation.");
         } else {
-            return "redirect:/login";
+            model.addAttribute("message", "Votre compte a été créé. Veuillez vous connecter.");
         }
+
+        return "login";
     }
 
-    // --- --------Affichage profil utilisateur ---
+    // ======= PROFILS =======
     @GetMapping("/profil-utilisateur")
     public String profilUtilisateur(Model model, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) return "redirect:/login";
-
-        Utilisateur utilisateur = utilisateurRepository.findById(userId).orElse(null);
-        if (utilisateur == null) return "redirect:/login";
-
-        model.addAttribute("utilisateur", utilisateur);
-
+        model.addAttribute("utilisateur", utilisateurRepository.findById(userId).orElse(null));
         return "utilisateur/profil-utilisateur";
     }
-    // --- --------Affichage profil utilisateur ---
+
     @GetMapping("/profil-admin")
     public String profilAdmin(Model model, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) return "redirect:/login";
-
-        Utilisateur utilisateur = utilisateurRepository.findById(userId).orElse(null);
-        if (utilisateur == null) return "redirect:/login";
-
-        model.addAttribute("utilisateur", utilisateur);
-
+        model.addAttribute("utilisateur", utilisateurRepository.findById(userId).orElse(null));
         return "admin/profil-admin";
     }
-    // --- ---------Affichage profil utilisateur pharma ---
+
     @GetMapping("/profil-pharmacie")
     public String profilPharmacie(Model model, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) return "redirect:/login";
-
-        Utilisateur utilisateur = utilisateurRepository.findById(userId).orElse(null);
-        if (utilisateur == null) return "redirect:/login";
-
-        model.addAttribute("utilisateur", utilisateur);
-
-        return "pharmacie/profil-pharmacie"; // vérifie aussi le nom du fichier HTML dans templates
-    }
-    // --- Modification du profil utilisateur ---
-    @PostMapping("/utilisateur/modifier")
-    public String modifierUtilisateur(@ModelAttribute Utilisateur utilisateurModifie) {
-        Utilisateur ancien = utilisateurRepository.findById(utilisateurModifie.getId()).orElse(null);
-
-        if (ancien != null) {
-            if (utilisateurModifie.getNom() != null && !utilisateurModifie.getNom().isEmpty()) {
-                ancien.setNom(utilisateurModifie.getNom());
-            }
-            if (utilisateurModifie.getPrenom() != null && !utilisateurModifie.getPrenom().isEmpty()) {
-                ancien.setPrenom(utilisateurModifie.getPrenom());
-            }
-            if (utilisateurModifie.getGenre() != null && !utilisateurModifie.getGenre().isEmpty()) {
-                ancien.setGenre(utilisateurModifie.getGenre());
-            }
-            if (utilisateurModifie.getDateNaissance() != null) {
-                ancien.setDateNaissance(utilisateurModifie.getDateNaissance());
-            }
-            if (utilisateurModifie.getEmail() != null && !utilisateurModifie.getEmail().isEmpty()) {
-                ancien.setEmail(utilisateurModifie.getEmail());
-            }
-            if (utilisateurModifie.getTelephone() != null && !utilisateurModifie.getTelephone().isEmpty()) {
-                ancien.setTelephone(utilisateurModifie.getTelephone());
-            }
-            if (utilisateurModifie.getAdresse() != null && !utilisateurModifie.getAdresse().isEmpty()) {
-                ancien.setAdresse(utilisateurModifie.getAdresse());
-            }
-            if (utilisateurModifie.getVille() != null && !utilisateurModifie.getVille().isEmpty()) {
-                ancien.setVille(utilisateurModifie.getVille());
-            }
-
-            utilisateurRepository.save(ancien);
-        }
-
-        return "redirect:/profil-utilisateur";
-    }
-    //______modification de donnees pharma--------
-    @PostMapping("/pharmacie/modifier")
-    public String modifierPharmacie(
-            @ModelAttribute Utilisateur pharmacieModifiee,
-            @RequestParam(value = "registreCommerce", required = false) MultipartFile registreCommerceFile,
-            @RequestParam(value = "cinPharmacien", required = false) MultipartFile cinPharmacienFile,
-            @RequestParam(value = "autorisationMinistere", required = false) MultipartFile autorisationMinistereFile
-    ) {
-        Utilisateur ancienne = utilisateurRepository.findById(pharmacieModifiee.getId()).orElse(null);
-
-        if (ancienne != null) {
-            if (pharmacieModifiee.getNomPharmacie() != null && !pharmacieModifiee.getNomPharmacie().isEmpty()) {
-                ancienne.setNomPharmacie(pharmacieModifiee.getNomPharmacie());
-            }
-            if (pharmacieModifiee.getNom() != null && !pharmacieModifiee.getNom().isEmpty()) {
-                ancienne.setNom(pharmacieModifiee.getNom());
-            }
-            if (pharmacieModifiee.getPrenom() != null && !pharmacieModifiee.getPrenom().isEmpty()) {
-                ancienne.setPrenom(pharmacieModifiee.getPrenom());
-            }
-            if (pharmacieModifiee.getNumeroLicence() != null && !pharmacieModifiee.getNumeroLicence().isEmpty()) {
-                ancienne.setNumeroLicence(pharmacieModifiee.getNumeroLicence());
-            }
-            if (pharmacieModifiee.getNumeroOrdre() != null && !pharmacieModifiee.getNumeroOrdre().isEmpty()) {
-                ancienne.setNumeroOrdre(pharmacieModifiee.getNumeroOrdre());
-            }
-            if (pharmacieModifiee.getAdresse() != null && !pharmacieModifiee.getAdresse().isEmpty()) {
-                ancienne.setAdresse(pharmacieModifiee.getAdresse());
-            }
-            if (pharmacieModifiee.getVille() != null && !pharmacieModifiee.getVille().isEmpty()) {
-                ancienne.setVille(pharmacieModifiee.getVille());
-            }
-            if (pharmacieModifiee.getTelephone() != null && !pharmacieModifiee.getTelephone().isEmpty()) {
-                ancienne.setTelephone(pharmacieModifiee.getTelephone());
-            }
-            if (pharmacieModifiee.getEmail() != null && !pharmacieModifiee.getEmail().isEmpty()) {
-                ancienne.setEmail(pharmacieModifiee.getEmail());
-            }
-
-            try {
-                if (registreCommerceFile != null && !registreCommerceFile.isEmpty()) {
-                    ancienne.setRegistreCommerce(registreCommerceFile.getBytes());
-                }
-                if (cinPharmacienFile != null && !cinPharmacienFile.isEmpty()) {
-                    ancienne.setCinPharmacien(cinPharmacienFile.getBytes());
-                }
-                if (autorisationMinistereFile != null && !autorisationMinistereFile.isEmpty()) {
-                    ancienne.setAutorisationMinistere(autorisationMinistereFile.getBytes());
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            utilisateurRepository.save(ancienne);
-        }
-
-        return "redirect:/profil-pharmacie";
+        model.addAttribute("utilisateur", utilisateurRepository.findById(userId).orElse(null));
+        return "pharmacie/profil-pharmacie";
     }
 
-
-    // --- Changer mot de passe  de utilisateur---
-    @Transactional
-    @PostMapping("/utilisateur/changer-mot-de-passe")
-    public String changerMotDePasse(
-            @RequestParam String ancienMotDePasse,
-            @RequestParam String nouveauMotDePasse,
-            @RequestParam String confirmationMotDePasse,
-            HttpSession session
-    ) {
-        Long userId = (Long) session.getAttribute("userId");
-        if (userId == null) return "redirect:/login";
-
-        Utilisateur utilisateur = utilisateurRepository.findById(userId).orElse(null);
-        if (utilisateur == null) return "redirect:/login";
-
-        // Vérifier ancien mot de passe
-        if (!utilisateur.getMotDePasse().equals(ancienMotDePasse)) {
-            return "redirect:/profil-utilisateur?error=Ancien mot de passe incorrect";
-        }
-
-        // Vérifier confirmation
-        if (!nouveauMotDePasse.equals(confirmationMotDePasse)) {
-            return "redirect:/profil-utilisateur?error=Les mots de passe ne correspondent pas";
-        }
-
-        utilisateur.setMotDePasse(nouveauMotDePasse);
-        utilisateurRepository.save(utilisateur);
-
-        return "redirect:/profil-utilisateur?success=Mot de passe changé avec succès";
-    }
-
-    // conditions.html dans templates
-    @GetMapping("/conditions")
-    public String conditions() {
-        return "conditions";
-    }
-    // --- Déconnexion ---
-    @PostMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate();
-        return "redirect:/login";
-    }
-    // --- Accueils personnalisés ---
-    //-----------------accueil admin---------
+    // ======= ACCUEILS =======
     @GetMapping("/accueil-admin")
     public String accueilAdmin(Model model, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
-        if (userId != null) {
-            Utilisateur utilisateur = utilisateurRepository.findById(userId).orElse(null);
-            model.addAttribute("utilisateur", utilisateur);
-            return "admin/accueil-admin";
-        } else {
-            return "redirect:/login";
-        }
+        if (userId != null) model.addAttribute("utilisateur", utilisateurRepository.findById(userId).orElse(null));
+        else return "redirect:/login";
+        return "admin/accueil-admin";
     }
-    //-----------------accueil user---------
+
     @GetMapping("/accueil-utilisateur")
     public String accueilUtilisateur(Model model, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
-        if (userId != null) {
-            Utilisateur utilisateur = utilisateurRepository.findById(userId).orElse(null);
-            model.addAttribute("utilisateur", utilisateur);
-            return "utilisateur/accueil-utilisateur";
-        } else {
-            return "redirect:/login";
-        }
+        if (userId != null) model.addAttribute("utilisateur", utilisateurRepository.findById(userId).orElse(null));
+        else return "redirect:/login";
+        return "utilisateur/accueil-utilisateur";
     }
-    //-----------------accueil pharma---------
+
     @GetMapping("/accueil-pharmacie")
     public String accueilPharmacie(Model model, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
-        if (userId != null) {
-            Utilisateur utilisateur = utilisateurRepository.findById(userId).orElse(null);
-            model.addAttribute("utilisateur", utilisateur);
-            return "pharmacie/accueil-pharmacie";
-        } else {
-            return "redirect:/login";
-        }
+        if (userId != null) model.addAttribute("utilisateur", utilisateurRepository.findById(userId).orElse(null));
+        else return "redirect:/login";
+        return "pharmacie/accueil-pharmacie";
     }
-
-
-
 }
