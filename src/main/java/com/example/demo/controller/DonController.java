@@ -57,9 +57,9 @@ public class DonController {
         model.addAttribute("don", new Don());
         model.addAttribute("medicaments", medicaments);
 
-        // Récupérer toutes les pharmacies
+        // CORRECTION : Utiliser "pharmacies" au lieu de "pharmacies.html"
         List<Utilisateur> pharmacies = utilisateurRepository.findByRoleId(3L);
-        model.addAttribute("pharmacies", pharmacies);
+        model.addAttribute("pharmacies", pharmacies); // ← Changé de "pharmacies.html" à "pharmacies"
 
         return "utilisateur/ajouter-don";
     }
@@ -107,7 +107,7 @@ public class DonController {
 
         // récupérer les médicaments de l'utilisateur connecté
         List<Medicament> medicaments = medicamentRepository.findByUtilisateurId(userId);
-        // récupérer les pharmacies (les utilisateurs qui ont le rôle PHARMACIE)
+        // récupérer les pharmacies.html (les utilisateurs qui ont le rôle PHARMACIE)
         List<Utilisateur> pharmacies = utilisateurRepository.findByRoleId(3L);
         model.addAttribute("pharmacies", pharmacies);
 

@@ -11,6 +11,7 @@
           --text-color: #333;
           --btn-bg: #74ebd5;
           --btn-hover: #5fc9bb;
+          --user-color: #1e6b77;
         }
 
         * {
@@ -99,23 +100,36 @@
           from { opacity: 0; transform: translateY(30px); }
           to { opacity: 1; transform: translateY(0); }
         }
-         .nav-links {
+
+        .nav-links {
           display: flex;
           justify-content: center;
           align-items: center;
           flex-wrap: wrap;
+          gap: 15px;
         }
 
         .nav-links a {
-          margin: 0 12px;
           text-decoration: none;
           color: var(--text-color);
           font-weight: 500;
           transition: color 0.3s;
+          padding: 8px 12px;
         }
 
         .nav-links a:hover {
           color: var(--btn-hover);
+        }
+
+        /* Style pour le nom de l'utilisateur */
+        .user-name {
+          background-color: var(--user-color);
+          color: white;
+          padding: 8px 16px;
+          border-radius: 20px;
+          font-weight: 500;
+          margin-left: 10px;
+          font-size: 14px;
         }
 
         .nav-actions {
@@ -131,18 +145,33 @@
         }
 
         .icon-links svg {
-          width:50px;
-          height:50px;
+          width: 50px;
+          height: 50px;
           fill: var(--btn-bg);
           cursor: pointer;
           transition: fill 0.3s;
-          margin:15px;
+          margin: 15px;
         }
 
         .icon-links svg:hover {
           fill: var(--btn-hover);
         }
 
+        /* Responsive */
+        @media (max-width: 768px) {
+          nav {
+            flex-direction: column;
+            padding: 15px;
+          }
+
+          .nav-links {
+            margin: 15px 0;
+          }
+
+          .user-name {
+            margin: 10px 0;
+          }
+        }
     </style>
 </head>
 <body>
@@ -154,7 +183,7 @@
         <img th:src="@{/logo.png}" alt="Logo Dwaya" class="logo">
     </div>
 
-    <!-- Liens de navigation -->
+    <!-- Liens de navigation avec nom de l'utilisateur -->
     <div class="nav-links">
         <a th:href="@{/accueil-utilisateur}">Accueil</a>
         <a th:href="@{/medicament}">Médicaments</a>
@@ -162,6 +191,9 @@
         <a th:href="@{/espace-dons}">Dons</a>
         <a th:href="@{/pharmacies}">Pharmacies</a>
         <a th:href="@{/profil-utilisateur}">Profil</a>
+
+        <!-- Nom de l'utilisateur ajouté ici -->
+        <span class="user-name" th:text="${utilisateur.prenom} + ' ' + ${utilisateur.nom}">Prénom Nom</span>
     </div>
 
     <!-- Icônes SVG + Déconnexion -->

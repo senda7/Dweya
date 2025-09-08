@@ -15,47 +15,65 @@
 </head>
 <body>
 <div class="container">
-  <h2 class="mb-4 text-center">Ajouter un médicament</h2>
+  <h2 class="mb-4 text-center">Ajouter un médicament - Pharmacie <span th:text="${pharmacieId}"></span></h2>
 
-  <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-  <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+  <!-- Messages de succès/erreur depuis les paramètres URL -->
+  <div th:if="${param.success != null}" class="alert alert-success">
+    <span th:text="${param.success}">Médicament ajouté avec succès</span>
+  </div>
+  <div th:if="${param.error != null}" class="alert alert-danger">
+    <span th:text="${param.error}">Erreur lors de l'ajout</span>
+  </div>
 
-  <form th:action="@{/stock/ajouter}" th:object="${medicament}" method="post" enctype="multipart/form-data">
+  <!-- FORMULAIRE AVEC LA BONNE URL -->
+  <form th:action="@{'/pharmacie/' + ${pharmacieId} + '/gestion-stock/ajouter'}" method="post" enctype="multipart/form-data">
+
     <div class="mb-3">
-      <label>Nom</label>
-      <input type="text" th:field="*{nom}" class="form-control" required/>
+      <label class="form-label">Nom du médicament *</label>
+      <input type="text" name="nom" class="form-control" required minlength="2" maxlength="100"/>
     </div>
+
     <div class="mb-3">
-      <label>Prix (DT)</label>
-      <input type="number" th:field="*{prix}" class="form-control" step="0.01" required/>
+      <label class="form-label">Prix (DT) *</label>
+      <input type="number" name="prix" class="form-control" step="0.01" min="0.01" required/>
     </div>
+
     <div class="mb-3">
-      <label>Quantité</label>
-      <input type="number" th:field="*{quantite}" class="form-control" required/>
+      <label class="form-label">Quantité *</label>
+      <input type="number" name="quantite" class="form-control" min="0" required/>
     </div>
+
     <div class="mb-3">
-      <label>Description</label>
-      <textarea th:field="*{description}" class="form-control"></textarea>
+      <label class="form-label">Description</label>
+      <textarea name="description" class="form-control" rows="3" maxlength="500"></textarea>
     </div>
+
     <div class="mb-3">
-      <label>Ordonnance requise</label>
+      <label class="form-label">Ordonnance requise *</label>
       <div class="form-check">
-        <input class="form-check-input" type="radio" th:field="*{ordonnanceRequise}" th:value="true"/>
-        <label class="form-check-label">Oui</label>
+        <input class="form-check-input" type="radio" name="ordonnanceRequise" value="true" id="ordonnanceOui"/>
+        <label class="form-check-label" for="ordonnanceOui">Oui</label>
       </div>
       <div class="form-check">
-        <input class="form-check-input" type="radio" th:field="*{ordonnanceRequise}" th:value="false"/>
-        <label class="form-check-label">Non</label>
+        <input class="form-check-input" type="radio" name="ordonnanceRequise" value="false" id="ordonnanceNon" checked/>
+        <label class="form-check-label" for="ordonnanceNon">Non</label>
       </div>
     </div>
+
     <div class="mb-3">
-      <label>Photo</label>
-      <input type="file" name="photo" class="form-control" accept="image/*" required onchange="previewImage(this)">
+      <label class="form-label">Photo du médicament</label>
+      <input type="file" name="photo" class="form-control" accept="image/*" onchange="previewImage(this)"/>
+      <small class="text-muted">Formats acceptés: JPG, PNG, GIF (max 5MB)</small>
       <div id="imagePreview" class="mt-2"></div>
     </div>
+
     <div class="d-flex justify-content-end gap-2">
-      <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Enregistrer</button>
-      <a th:href="@{/stock}" class="btn btn-secondary"><i class="fas fa-times me-2"></i>Annuler</a>
+      <button type="submit" class="btn btn-primary">
+        Enregistrer
+      </button>
+      <a th:href="@{'/pharmacie/' + ${pharmacieId} + '/gestion-stock'}" class="btn btn-secondary">
+        Annuler
+      </a>
     </div>
   </form>
 </div>
@@ -65,6 +83,13 @@
       const preview = document.getElementById('imagePreview');
       preview.innerHTML = '';
       if(input.files && input.files[0]){
+          // Vérifier la taille du fichier
+          if(input.files[0].size > 5 * 1024 * 1024) {
+              alert('Le fichier ne doit pas dépasser 5MB');
+              input.value = '';
+              return;
+          }
+
           const reader = new FileReader();
           reader.onload = e => {
               const img = document.createElement('img');
@@ -76,6 +101,16 @@
           reader.readAsDataURL(input.files[0]);
       }
   }
+
+  // Validation du formulaire
+  document.querySelector('form').addEventListener('submit', function(e) {
+      const fileInput = document.querySelector('input[name="photo"]');
+      if (fileInput.files.length > 0 && fileInput.files[0].size > 5 * 1024 * 1024) {
+          e.preventDefault();
+          alert('La taille du fichier ne doit pas dépasser 5MB');
+          return false;
+      }
+  });
 </script>
 </body>
 </html>

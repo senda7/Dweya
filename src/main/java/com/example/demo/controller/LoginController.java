@@ -1,10 +1,12 @@
 package com.example.demo.controller;
 
+import com.example.demo.model.Notification;
 import com.example.demo.model.Role;
 import com.example.demo.model.Utilisateur;
 import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.UtilisateurRepository;
 import com.example.demo.service.AuthService;
+import com.example.demo.service.NotificationService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,11 +15,16 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.io.IOException;
+
 
 @Controller
 public class LoginController {
+    @Autowired
+    private NotificationService notificationService;
+
 
     @Autowired
     private AuthService authService;
@@ -189,8 +196,28 @@ public class LoginController {
     @GetMapping("/accueil-pharmacie")
     public String accueilPharmacie(Model model, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
-        if (userId != null) model.addAttribute("utilisateur", utilisateurRepository.findById(userId).orElse(null));
-        else return "redirect:/login";
+        if (userId == null) {
+            return "redirect:/login";
+        }
+
+        Utilisateur utilisateur = utilisateurRepository.findById(userId).orElse(null);
+        model.addAttribute("utilisateur", utilisateur);
+
+        // Initialiser avec des valeurs par défaut
+        List<Notification> notifications = new ArrayList<>();
+        int unreadCount = 0;
+
+        try {
+            notifications = notificationService.getAllNotifications(userId);
+            unreadCount = notificationService.getUnreadCount(userId);
+        } catch (Exception e) {
+            // Log l'erreur mais continue avec les valeurs par défaut
+            System.out.println("Erreur lors du chargement des notifications: " + e.getMessage());
+        }
+
+        model.addAttribute("notifications", notifications);
+        model.addAttribute("unreadCount", unreadCount);
+
         return "pharmacie/accueil-pharmacie";
     }
 }

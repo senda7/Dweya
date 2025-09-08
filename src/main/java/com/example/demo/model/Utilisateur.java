@@ -14,7 +14,6 @@ public class Utilisateur {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // ===== Champs communs =====
     private String nom;
     private String prenom;
     private String genre;

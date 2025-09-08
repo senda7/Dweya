@@ -11,6 +11,7 @@
           --text-color: #333;
           --btn-bg: #74ebd5;
           --btn-hover: #5fc9bb;
+          --alert-color: #ff4757;
         }
 
         * {
@@ -43,6 +44,7 @@
           display: flex;
           align-items: center;
         }
+
         .logo {
           width: 110px;
           height: 110px;
@@ -55,6 +57,72 @@
           50% { transform: translateY(-8px); }
         }
 
+        /* Styles pour les notifications */
+        .notification-badge {
+          position: relative;
+          display: inline-block;
+        }
+
+        .notification-count {
+          position: absolute;
+          top: -8px;
+          right: -8px;
+          background-color: var(--alert-color);
+          color: white;
+          border-radius: 50%;
+          width: 20px;
+          height: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          font-weight: bold;
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            width: 350px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1001;
+            display: none; /* Caché par défaut */
+        }
+
+        .notification-dropdown.show {
+            display: block; /* Affiché quand la classe 'show' est ajoutée */
+        }
+
+        .notification-item {
+          padding: 15px;
+          border-bottom: 1px solid #eee;
+          cursor: pointer;
+          transition: background-color 0.3s;
+        }
+
+        .notification-item:hover {
+          background-color: #f8f9fa;
+        }
+
+        .notification-item.unread {
+          background-color: #fff8e6;
+        }
+
+        .notification-message {
+          font-size: 14px;
+          margin-bottom: 5px;
+        }
+
+        .notification-time {
+          font-size: 12px;
+          color: #6c757d;
+        }
+
+        /* Autres styles */
         .logout-btn {
           background-color: transparent;
           border: 2px solid var(--btn-bg);
@@ -63,6 +131,7 @@
           border-radius: 8px;
           cursor: pointer;
           transition: 0.3s;
+          font-weight: 500;
         }
 
         .logout-btn:hover {
@@ -70,36 +139,12 @@
           color: white;
         }
 
-        /* Hero section */
         .hero {
           padding: 80px 20px 60px;
           text-align: center;
         }
 
-        .hero h1 {
-          font-size: 40px;
-          margin-bottom: 20px;
-          animation: fadeInDown 1.2s ease;
-        }
-
-        .hero p {
-          font-size: 18px;
-          color: #555;
-          max-width: 700px;
-          margin: auto;
-          animation: fadeInUp 1.5s ease;
-        }
-
-        @keyframes fadeInDown {
-          from { opacity: 0; transform: translateY(-30px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(30px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-         .nav-links {
+        .nav-links {
           display: flex;
           justify-content: center;
           align-items: center;
@@ -130,48 +175,88 @@
           gap: 15px;
         }
 
+        .icon-links a {
+          display: flex;
+          align-items: center;
+          text-decoration: none;
+          color: var(--text-color);
+        }
+
         .icon-links svg {
-          width:50px;
-          height:50px;
+          width: 50px;
+          height: 50px;
           fill: var(--btn-bg);
           cursor: pointer;
           transition: fill 0.3s;
-          margin:15px;
         }
 
         .icon-links svg:hover {
           fill: var(--btn-hover);
         }
 
+        .pharmacy-name {
+          font-weight: bold;
+          color: var(--main-color);
+          margin-left: 8px;
+          font-size: 16px;
+          padding: 5px 12px;
+          border-left: 2px solid #eee;
+        }
+
+        .description {
+          font-size: 18px;
+          color: #555;
+          line-height: 1.6;
+        }
+
+        /* Message d'erreur */
+        .error-message {
+            display: none;
+        }
     </style>
 </head>
 <body>
 
 <!-- Navbar -->
 <nav>
-    <!-- Logo -->
     <div class="logo-container">
         <img th:src="@{/logo.png}" alt="Logo Dwaya" class="logo">
     </div>
 
-    <!-- Liens de navigation -->
+    <!-- Liens de navigation CORRIGÉS -->
     <div class="nav-links">
         <a th:href="@{/accueil-pharmacie}">Accueil</a>
-        <a th:href="@{/stock}">gestion de stock</a>
-        <a th:href="@{/dons-pharmacie}">gestion des dons</a>
-        <a th:href="@{/commandes}">Commandes</a>
+        <a th:href="@{/pharmacie/{id}/gestion-stock(id=${utilisateur.id})}">Gestion de stock</a>
+        <a th:href="@{/dons-pharmacie}">Gestion des dons</a>
+        <a th:href="@{/commande-pharmacie}">Commandes</a>
         <a th:href="@{/profil-pharmacie}">Profil</a>
+        <span class="pharmacy-name" th:text="${utilisateur != null ? utilisateur.nomPharmacie : 'Pharmacie'}">Nom Pharmacie</span>
     </div>
 
-    <!-- Icônes SVG + Déconnexion -->
     <div class="nav-actions">
         <div class="icon-links">
-            <!-- Notification -->
-            <a th:href="@{/notifications}" title="Notifications">
-                <svg viewBox="0 0 24 24"><path d="M12 2C10.34 2 9 3.34 9 5v1.07C6.16
-        6.56 4 8.92 4 12v5l-1 1v1h18v-1l-1-1v-5c0-3.08-2.16-5.44-5-5.93V5c0-1.66-1.34-3-3-3zM12
-        22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2z"/></svg>
-            </a>
+            <!-- Notification avec badge -->
+            <div class="notification-badge">
+                <a href="#" onclick="toggleNotifications(event)" title="Notifications">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2C10.34 2 9 3.34 9 5v1.07C6.16 6.56 4 8.92 4 12v5l-1 1v1h18v-1l-1-1v-5c0-3.08-2.16-5.44-5-5.93V5c0-1.66-1.34-3-3-3zM12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2z"/>
+                    </svg>
+                    <span th:if="${unreadCount > 0}" class="notification-count" th:text="${unreadCount}">0</span>
+                </a>
+
+                <!-- Dropdown des notifications -->
+                <div class="notification-dropdown" id="notificationDropdown">
+                    <div th:if="${notifications != null and !notifications.isEmpty()}">
+                        <div th:each="notif : ${notifications}" class="notification-item" th:classappend="${notif.read} ? '' : 'unread'" th:onclick="'markAsRead(' + ${notif.id} + ', this)'">
+                            <div class="notification-message" th:text="${notif.message}"></div>
+                            <div class="notification-time" th:text="${#temporals.format(notif.createdAt, 'dd/MM/yyyy HH:mm')}"></div>
+                        </div>
+                    </div>
+                    <div th:if="${notifications == null or notifications.isEmpty()}" class="notification-item">
+                        <div class="notification-message">Aucune notification</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <form th:action="@{/logout}" method="post">
@@ -182,15 +267,81 @@
 
 <!-- Hero section -->
 <section class="hero">
-    <h1>Bienvenue,Pharmacie, <span th:text="${utilisateur.nom}"></span> 👋</h1>
+    <h1>Bienvenue, Pharmacie <span th:text="${utilisateur != null ? utilisateur.nomPharmacie : ''}"></span> 👋</h1>
     <div class="content">
         <p class="description">
             Gérez vos commandes et votre stock, suivez vos ventes,<br>
             recevez et redistribuez les dons en toute sécurité. <br>
-            utilisez le menu ci-dessus pour naviguer entre les différentes sections.
+            Utilisez le menu ci-dessus pour naviguer entre les différentes sections.
         </p>
     </div>
 </section>
+
+<!-- Message d'erreur caché -->
+<div class="error-message">
+    Gestion des erreurs de variables Thymeleaf document.addEventListener('DOMContentLoaded', function() { // Vérifier si les variables existent const unreadCount =
+    ocument.querySelector('.notification-count'); if (unreadCount && lunreadCount.textContent) { unreadCount.style.display = 'none'; } });
+</div>
+
+<script>
+    function toggleNotifications(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        const dropdown = document.getElementById('notificationDropdown');
+        dropdown.classList.toggle('show');
+    }
+
+    function markAsRead(notificationId, element) {
+        // Mettre à jour visuellement l'élément immédiatement
+        element.classList.remove('unread');
+
+        // Envoyer la requête au serveur
+        fetch('/api/notifications/mark-as-read/' + notificationId, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                // Mettre à jour le compteur de notifications non lues
+                const countElement = document.querySelector('.notification-count');
+                if (countElement) {
+                    const currentCount = parseInt(countElement.textContent) || 0;
+                    if (currentCount > 1) {
+                        countElement.textContent = currentCount - 1;
+                    } else {
+                        countElement.style.display = 'none';
+                    }
+                }
+            } else {
+                // En cas d'erreur, remettre le style "unread"
+                element.classList.add('unread');
+            }
+        }).catch(error => {
+            console.error('Erreur:', error);
+            element.classList.add('unread');
+        });
+    }
+
+    // Fermer le dropdown si on clique ailleurs
+    document.addEventListener('click', function(event) {
+        const dropdown = document.getElementById('notificationDropdown');
+        const notificationBadge = document.querySelector('.notification-badge');
+
+        if (dropdown && notificationBadge && !notificationBadge.contains(event.target)) {
+            dropdown.classList.remove('show');
+        }
+    });
+
+    // Gestion des erreurs de variables Thymeleaf
+    document.addEventListener('DOMContentLoaded', function() {
+        // Vérifier si les variables existent
+        const unreadCount = document.querySelector('.notification-count');
+        if (unreadCount && (!unreadCount.textContent || unreadCount.textContent === '0')) {
+            unreadCount.style.display = 'none';
+        }
+    });
+</script>
 
 </body>
 </html>
