@@ -1,4 +1,3 @@
-
 package com.example.demo.model;
 
 import jakarta.persistence.*;
@@ -20,18 +19,29 @@ public class Medpharmacie {
 
     private Integer quantite;
 
-    @Lob // Annotation importante pour les gros objets
-    @Column(name = "photo_data", columnDefinition = "LONGTEXT") // LONGTEXT pour MySQL
-    private String photoData; // Changé de photoPath à photoData
+    @Column(name = "quantite_vendue", nullable = false)
+    private Integer quantiteVendue = 0;
+
+    @Lob
+    @Column(name = "photo_data", columnDefinition = "LONGTEXT")
+    private String photoData;
 
     @Column(name = "ordonnance_requise")
     private boolean ordonnanceRequise;
 
+    // Modification : utiliser l'ID de l'utilisateur pharmacie
     @Column(name = "pharmacie_id", nullable = false)
     private Long pharmacieId;
 
+    // Relation ManyToOne vers Utilisateur (pharmacie)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pharmacie_id", insertable = false, updatable = false)
+    private Utilisateur pharmacie;
+
     // Constructeurs
-    public Medpharmacie() {}
+    public Medpharmacie() {
+        this.quantiteVendue = 0;
+    }
 
     public Medpharmacie(String nom, String description, Double prix, Integer quantite,
                         boolean ordonnanceRequise, Long pharmacieId) {
@@ -41,6 +51,7 @@ public class Medpharmacie {
         this.quantite = quantite;
         this.ordonnanceRequise = ordonnanceRequise;
         this.pharmacieId = pharmacieId;
+        this.quantiteVendue = 0;
     }
 
     // Getters et setters
@@ -59,6 +70,9 @@ public class Medpharmacie {
     public Integer getQuantite() { return quantite; }
     public void setQuantite(Integer quantite) { this.quantite = quantite; }
 
+    public Integer getQuantiteVendue() { return quantiteVendue; }
+    public void setQuantiteVendue(Integer quantiteVendue) { this.quantiteVendue = quantiteVendue; }
+
     public String getPhotoData() { return photoData; }
     public void setPhotoData(String photoData) { this.photoData = photoData; }
 
@@ -67,4 +81,7 @@ public class Medpharmacie {
 
     public Long getPharmacieId() { return pharmacieId; }
     public void setPharmacieId(Long pharmacieId) { this.pharmacieId = pharmacieId; }
+
+    public Utilisateur getPharmacie() { return pharmacie; }
+    public void setPharmacie(Utilisateur pharmacie) { this.pharmacie = pharmacie; }
 }

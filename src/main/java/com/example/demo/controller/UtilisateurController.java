@@ -33,7 +33,7 @@ public class UtilisateurController {
         return "admin/liste-utilisateur";
     }
 
-    //---------- Liste des pharmacies uniquement
+    //---------- Liste des pharmacies.html uniquement
     @GetMapping("/admin/liste-pharmacies")
     public String listePharmacies(Model model) {
         List<Utilisateur> pharmacies = utilisateurRepository.findAll()

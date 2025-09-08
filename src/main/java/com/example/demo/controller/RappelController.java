@@ -2,8 +2,10 @@ package com.example.demo.controller;
 
 import com.example.demo.model.Rappel;
 import com.example.demo.model.Medicament;
+import com.example.demo.model.Utilisateur;
 import com.example.demo.repository.MedicamentRepository;
 import com.example.demo.repository.RappelRepository;
+import com.example.demo.repository.UtilisateurRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,6 +23,9 @@ public class RappelController {
     @Autowired
     private MedicamentRepository medicamentRepository;
 
+    @Autowired
+    private UtilisateurRepository utilisateurRepository;
+
     //afficher rappels liés uniquement aux médicaments de l'utilisateur connecté
     @GetMapping("/rappels")
     public String listerRappels(Model model, HttpSession session) {
@@ -28,7 +33,10 @@ public class RappelController {
         if (userId == null) return "redirect:/login";
 
         List<Rappel> rappels = rappelRepository.findByMedicament_Utilisateur_Id(userId);
+        Utilisateur utilisateur = utilisateurRepository.findById(userId).orElse(null);
+
         model.addAttribute("rappels", rappels);
+        model.addAttribute("utilisateur", utilisateur);
         return "utilisateur/rappels";
     }
 
@@ -39,12 +47,15 @@ public class RappelController {
         if (userId == null) return "redirect:/login";
 
         List<Medicament> medicaments = medicamentRepository.findByUtilisateurId(userId);
+        Utilisateur utilisateur = utilisateurRepository.findById(userId).orElse(null);
+
         model.addAttribute("rappel", new Rappel());
         model.addAttribute("medicaments", medicaments);
+        model.addAttribute("utilisateur", utilisateur);
         return "utilisateur/ajouter-rappel";
     }
 
-    //traiter ajout
+    //traiter ajout - CORRIGÉ
     @PostMapping("/ajouter-rappel")
     public String submitForm(@ModelAttribute Rappel rappel, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
@@ -56,6 +67,7 @@ public class RappelController {
         }
 
         rappel.setMedicament(med);
+
         rappelRepository.save(rappel);
         return "redirect:/rappels";
     }
@@ -72,12 +84,15 @@ public class RappelController {
         }
 
         List<Medicament> medicaments = medicamentRepository.findByUtilisateurId(userId);
+        Utilisateur utilisateur = utilisateurRepository.findById(userId).orElse(null);
+
         model.addAttribute("rappel", rappel);
         model.addAttribute("medicaments", medicaments);
+        model.addAttribute("utilisateur", utilisateur);
         return "utilisateur/modifier-rappel";
     }
 
-    //enregistrer modification
+    //enregistrer modification - CORRIGÉ
     @PostMapping("/modifier-rappel")
     public String modifierRappel(@ModelAttribute Rappel rappel, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
@@ -87,6 +102,10 @@ public class RappelController {
         if (med == null || !med.getUtilisateur().getId().equals(userId)) {
             return "redirect:/rappels";
         }
+
+        // Récupérer le rappel existant pour conserver la valeur actif
+        Rappel rappelExistant = rappelRepository.findById(rappel.getId()).orElse(null);
+
 
         rappel.setMedicament(med);
         rappelRepository.save(rappel);

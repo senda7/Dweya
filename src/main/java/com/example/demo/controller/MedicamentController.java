@@ -30,8 +30,14 @@ public class MedicamentController {
         }
 
         List<Medicament> medicaments = medicamentRepo.findByUtilisateurId(userId);
+
+        // AJOUT: Récupérer l'utilisateur et l'ajouter au modèle
+        Utilisateur utilisateur = utilisateurRepo.findById(userId).orElse(null);
+
         model.addAttribute("medicaments", medicaments);
-        return "utilisateur/medicament"; // Thymeleaf page medicament.html
+        model.addAttribute("utilisateur", utilisateur); // ← CORRECTION IMPORTANTE
+
+        return "utilisateur/medicament";
     }
 
     //afficher formulaire d'ajout
@@ -42,7 +48,7 @@ public class MedicamentController {
         }
 
         model.addAttribute("medicament", new Medicament());
-        return "utilisateur/ajouter-medicament"; // formulaire HTML
+        return "utilisateur/ajouter-medicament";
     }
 
     // enregistrer un médicament

@@ -112,12 +112,46 @@
 
     <div class="d-flex flex-column gap-2">
       <a th:href="@{'/dons/modifier/' + ${don.id}}" class="btn btn-sm btn-outline-success">Modifier</a>
-      <a th:href="@{'/dons/supprimer/' + ${don.id}}"
-         onclick="return confirm('Supprimer ce don ?')"
-         class="btn btn-sm btn-outline-danger">Supprimer</a>
+
+      <!-- Bouton Supprimer avec SweetAlert -->
+      <a href="#"
+         th:attr="data-id=${don.id}"
+         class="btn btn-sm btn-outline-danger btn-delete">
+        Supprimer
+      </a>
     </div>
   </div>
 </div>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const deleteButtons = document.querySelectorAll(".btn-delete");
+
+    deleteButtons.forEach(button => {
+      button.addEventListener("click", function (e) {
+        e.preventDefault(); // empêche la navigation directe
+        const donId = this.getAttribute("data-id");
+
+        Swal.fire({
+          title: "Êtes-vous sûr ?",
+          text: "Cette action est irréversible !",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#3085d6",
+          confirmButtonText: "Oui, supprimer",
+          cancelButtonText: "Annuler"
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = "/dons/supprimer/" + donId;
+          }
+        });
+      });
+    });
+  });
+</script>
 
 </body>
 </html>
