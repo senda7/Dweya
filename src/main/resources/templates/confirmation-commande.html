@@ -1,409 +1,368 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Confirmation de Commande | Dwaya</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-  <style>
-    :root {
-      --primary-color: #1e6b77;
-      --secondary-color: #74ebd5;
-      --accent-color: #ACB6E5;
-      --success-color: #28a745;
-      --text-color: #333;
-      --light-bg: #f8f9fa;
-      --border-color: #dee2e6;
-      --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmation de Commande | Dwaya</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+          --primary-color: #1e6b77;
+          --secondary-color: #74ebd5;
+          --accent-color: #ACB6E5;
+          --success-color: #28a745;
+          --text-color: #333;
+          --light-bg: #f8f9fa;
+          --border-color: #dee2e6;
+          --shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+        body {
+          font-family: 'Roboto', sans-serif;
+          background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+          min-height: 100vh;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 20px;
+          color: var(--text-color);
+        }
 
-    body {
-      font-family: 'Roboto', sans-serif;
-      background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
-      min-height: 100vh;
-      padding: 20px;
-      color: var(--text-color);
-    }
+        .confirmation-card {
+          background: white;
+          border-radius: 20px;
+          padding: 40px;
+          box-shadow: var(--shadow);
+          max-width: 900px;
+          width: 100%;
+          animation: fadeIn 0.7s ease-out;
+        }
 
-    .main-container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
+        .success-icon {
+          font-size: 80px;
+          color: var(--success-color);
+          margin-bottom: 20px;
+          text-align: center;
+        }
 
-    .header {
-      background: white;
-      border-radius: 15px;
-      padding: 20px;
-      margin-bottom: 30px;
-      box-shadow: var(--shadow);
-      text-align: center;
-    }
+        .confirmation-title {
+          color: var(--primary-color);
+          font-size: 2rem;
+          font-weight: 700;
+          text-align: center;
+          margin-bottom: 25px;
+        }
 
-    .logo {
-      width: 120px;
-      height: 120px;
-      margin-bottom: 15px;
-    }
+        .order-details {
+          background: var(--light-bg);
+          border-radius: 12px;
+          padding: 25px;
+          margin: 25px 0;
+        }
 
-    .confirmation-card {
-      background: white;
-      border-radius: 15px;
-      padding: 40px;
-      box-shadow: var(--shadow);
-      margin-bottom: 30px;
-    }
+        .order-section {
+          margin-bottom: 25px;
+        }
 
-    .success-icon {
-      font-size: 80px;
-      color: var(--success-color);
-      margin-bottom: 20px;
-      text-align: center;
-    }
+        .order-section h4 {
+          color: var(--primary-color);
+          font-weight: 600;
+          border-bottom: 2px solid var(--secondary-color);
+          padding-bottom: 8px;
+          margin-bottom: 15px;
+        }
 
-    .confirmation-title {
-      color: var(--primary-color);
-      font-size: 2.5rem;
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 30px;
-    }
+        .detail-item {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 10px;
+        }
 
-    .order-details {
-      background: var(--light-bg);
-      border-radius: 10px;
-      padding: 30px;
-      margin: 30px 0;
-    }
+        .detail-item strong {
+          color: var(--primary-color);
+        }
 
-    .order-section {
-      margin-bottom: 25px;
-    }
+        .product-list {
+          margin-top: 20px;
+        }
 
-    .order-section h4 {
-      color: var(--primary-color);
-      margin-bottom: 15px;
-      font-weight: 600;
-      border-bottom: 2px solid var(--secondary-color);
-      padding-bottom: 10px;
-    }
+        .product-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 12px;
+          border: 1px solid var(--border-color);
+          border-radius: 10px;
+          margin-bottom: 10px;
+          background: white;
+        }
 
-    .detail-item {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-      padding: 8px 0;
-    }
+        .product-info {
+          flex: 1;
+        }
 
-    .detail-item strong {
-      color: var(--primary-color);
-    }
+        .product-name {
+          font-weight: 600;
+          color: var(--primary-color);
+          margin-bottom: 5px;
+        }
 
-    .product-list {
-      margin-top: 20px;
-    }
+        .product-details {
+          font-size: 0.9rem;
+          color: #666;
+        }
 
-    .product-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      margin-bottom: 10px;
-      background: white;
-    }
+        .product-price {
+          font-weight: 600;
+          color: var(--primary-color);
+          text-align: right;
+          min-width: 120px;
+        }
 
-    .product-info {
-      flex: 1;
-    }
+        .order-total {
+          background: var(--primary-color);
+          color: white;
+          padding: 15px;
+          border-radius: 10px;
+          text-align: center;
+          margin-top: 15px;
+        }
 
-    .product-name {
-      font-weight: 600;
-      color: var(--primary-color);
-      margin-bottom: 5px;
-    }
+        .total-amount {
+          font-size: 1.4rem;
+          font-weight: 700;
+        }
 
-    .product-details {
-      font-size: 0.9rem;
-      color: #666;
-    }
+        .confirmation-message {
+          text-align: center;
+          padding: 15px;
+          background: var(--light-bg);
+          border-radius: 10px;
+          margin: 20px 0;
+          font-style: italic;
+        }
 
-    .product-price {
-      font-weight: 600;
-      color: var(--primary-color);
-      text-align: right;
-      min-width: 120px;
-    }
+        .action-buttons {
+          display: flex;
+          gap: 15px;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
 
-    .order-total {
-      background: var(--primary-color);
-      color: white;
-      padding: 20px;
-      border-radius: 10px;
-      text-align: center;
-      margin-top: 20px;
-    }
+        .btn {
+          padding: 12px 30px;
+          border-radius: 10px;
+          text-decoration: none;
+          font-weight: 500;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          transition: 0.3s ease;
+        }
 
-    .total-amount {
-      font-size: 1.5rem;
-      font-weight: 700;
-    }
+        .btn-primary {
+          background: var(--primary-color);
+          color: white;
+          border: none;
+        }
 
-    .action-buttons {
-      display: flex;
-      gap: 15px;
-      justify-content: center;
-      margin-top: 30px;
-      flex-wrap: wrap;
-    }
+        .btn-primary:hover {
+          background: #155e63;
+          transform: translateY(-2px);
+        }
 
-    .btn {
-      padding: 12px 30px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
+        .btn-secondary {
+          background: var(--secondary-color);
+          color: var(--text-color);
+          border: none;
+        }
 
-    .btn-primary {
-      background: var(--primary-color);
-      color: white;
-      border: none;
-    }
+        .btn-secondary:hover {
+          background: #5fc9bb;
+          transform: translateY(-2px);
+        }
 
-    .btn-primary:hover {
-      background: #155e63;
-      transform: translateY(-2px);
-    }
+        @keyframes fadeIn {
+          from {opacity: 0; transform: translateY(20px);}
+          to {opacity: 1; transform: translateY(0);}
+        }
 
-    .btn-secondary {
-      background: var(--secondary-color);
-      color: var(--text-color);
-      border: none;
-    }
+        .icon {
+          margin-right: 8px;
+        }
 
-    .btn-secondary:hover {
-      background: #5fc9bb;
-      transform: translateY(-2px);
-    }
+        .error-container {
+          background: #ffe6e6;
+          border: 1px solid #ffcccc;
+          border-radius: 10px;
+          padding: 20px;
+          margin: 20px 0;
+          text-align: center;
+        }
 
-    .confirmation-message {
-      text-align: center;
-      padding: 20px;
-      background: var(--light-bg);
-      border-radius: 10px;
-      margin: 20px 0;
-      font-style: italic;
-    }
+        .error-icon {
+          color: #dc3545;
+          font-size: 40px;
+          margin-bottom: 15px;
+        }
 
-    @media (max-width: 768px) {
-      .confirmation-card {
-        padding: 20px;
-      }
+        @media (max-width: 768px) {
+          .confirmation-card {
+            padding: 20px;
+          }
 
-      .confirmation-title {
-        font-size: 2rem;
-      }
+          .confirmation-title {
+            font-size: 1.5rem;
+          }
 
-      .action-buttons {
-        flex-direction: column;
-        align-items: center;
-      }
+          .detail-item {
+            flex-direction: column;
+            align-items: flex-start;
+          }
 
-      .btn {
-        width: 100%;
-        justify-content: center;
-      }
+          .product-item {
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-start;
+          }
 
-      .product-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-      }
+          .product-price {
+            text-align: left;
+            width: 100%;
+          }
 
-      .product-price {
-        text-align: left;
-        width: 100%;
-      }
+          .action-buttons {
+            flex-direction: column;
+          }
 
-      .detail-item {
-        flex-direction: column;
-        gap: 5px;
-      }
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .confirmation-card {
-      animation: fadeIn 0.6s ease-out;
-    }
-
-    .icon {
-      margin-right: 8px;
-    }
-
-    .error-container {
-      background: #ffe6e6;
-      border: 1px solid #ffcccc;
-      border-radius: 10px;
-      padding: 20px;
-      margin: 20px 0;
-      text-align: center;
-    }
-
-    .error-icon {
-      color: #dc3545;
-      font-size: 40px;
-      margin-bottom: 15px;
-    }
-  </style>
+          .btn {
+            width: 100%;
+            justify-content: center;
+          }
+        }
+    </style>
 </head>
 <body>
-<div class="main-container">
-  <div class="header">
-    <img th:src="@{/logo.png}" src="https://via.placeholder.com/120x120/1e6b77/ffffff?text=Dwaya" alt="Logo Dwaya" class="logo">
-    <h1 class="confirmation-title">
-      <i class="fas fa-check-circle icon"></i>
-      Commande Confirmée avec Succès!
-    </h1>
-  </div>
-
-  <div class="confirmation-card">
+<div class="confirmation-card">
     <div class="success-icon">
-      <i class="fas fa-check-circle"></i>
+        <i class="fas fa-check-circle"></i>
     </div>
+    <h1 class="confirmation-title">
+        <i class="fas fa-check-circle icon"></i>
+        Commande Confirmée avec Succès!
+    </h1>
 
     <!-- Section d'erreur -->
     <div th:if="${error != null}" class="error-container">
-      <div class="error-icon">
-        <i class="fas fa-exclamation-triangle"></i>
-      </div>
-      <h3>Erreur</h3>
-      <p th:text="${error}">Message d'erreur</p>
-      <a th:href="@{/accueil-utilisateur}" class="btn btn-primary mt-3">
-        <i class="fas fa-home"></i> Retour à l'accueil
-      </a>
+        <div class="error-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h3>Erreur</h3>
+        <p th:text="${error}">Message d'erreur</p>
+        <a th:href="@{/accueil-utilisateur}" class="btn btn-primary mt-3">
+            <i class="fas fa-home"></i> Retour à l'accueil
+        </a>
     </div>
 
     <!-- Contenu normal -->
     <div th:unless="${error != null}">
-      <div class="order-details">
-        <!-- Informations de commande -->
-        <div class="order-section" th:if="${commande != null}">
-          <h4><i class="fas fa-info-circle icon"></i>Informations de la commande</h4>
-          <div class="detail-item">
-            <span><strong>Référence:</strong></span>
-            <span th:text="${commande.id} ?: 'Non disponible'">N°</span>
-          </div>
-          <div class="detail-item">
-            <span><strong>Date et heure:</strong></span>
-            <span th:if="${commande.dateCommande != null}"
-                  th:text="${#temporals.format(commande.dateCommande, 'dd/MM/yyyy à HH:mm')}">
-              Date
-            </span>
-            <span th:unless="${commande.dateCommande != null}">Non disponible</span>
-          </div>
-
-        </div>
-
-        <!-- Produits commandés - Utilisation directe de commande.medicaments -->
-        <div class="order-section" th:if="${commande != null and commande.medicaments != null and !commande.medicaments.empty}">
-          <h4><i class="fas fa-shopping-basket icon"></i>Produits commandés</h4>
-          <div class="product-list">
-            <div th:each="medicament : ${commande.medicaments}" class="product-item">
-              <div class="product-info">
-                <div class="product-name" th:text="${medicament.nom} ?: 'Médicament sans nom'">
-                  Nom du médicament
+        <div class="order-details">
+            <!-- Informations de commande -->
+            <div class="order-section" th:if="${commande != null}">
+                <h4><i class="fas fa-info-circle icon"></i>Informations de la commande</h4>
+                <div class="detail-item">
+                    <span><strong>Référence:</strong></span>
+                    <span th:text="${commande.id} ?: 'Non disponible'">N°</span>
                 </div>
-                <div class="product-details">
-                  Quantité: <span th:text="${medicament.quantite}">1</span> ×
-                  <span th:text="${#numbers.formatDecimal(medicament.prix, 1, 2) + ' TND'}">
-                    Prix unitaire
-                  </span>
+                <div class="detail-item">
+                    <span><strong>Date et heure:</strong></span>
+                    <span th:if="${commande.dateCommande != null}"
+                          th:text="${#temporals.format(commande.dateCommande, 'dd/MM/yyyy à HH:mm')}">
+            Date
+          </span>
+                    <span th:unless="${commande.dateCommande != null}">Non disponible</span>
                 </div>
-              </div>
-              <div class="product-price">
-                <span th:text="${#numbers.formatDecimal(medicament.prix * medicament.quantite, 1, 2) + ' TND'}">
-                  0.00 TND
-                </span>
-              </div>
             </div>
-          </div>
+
+            <!-- Produits commandés - Utilisation directe de commande.medicaments -->
+            <div class="order-section" th:if="${commande != null and commande.medicaments != null and !commande.medicaments.empty}">
+                <h4><i class="fas fa-shopping-basket icon"></i>Produits commandés</h4>
+                <div class="product-list">
+                    <div th:each="medicament : ${commande.medicaments}" class="product-item">
+                        <div class="product-info">
+                            <div class="product-name" th:text="${medicament.nom} ?: 'Médicament sans nom'">
+                                Nom du médicament
+                            </div>
+                            <div class="product-details">
+                                Quantité: <span th:text="${medicament.quantite}">1</span> ×
+                                <span th:text="${#numbers.formatDecimal(medicament.prix, 1, 2) + ' TND'}">
+                  Prix unitaire
+                </span>
+                            </div>
+                        </div>
+                        <div class="product-price">
+              <span th:text="${#numbers.formatDecimal(medicament.prix * medicament.quantite, 1, 2) + ' TND'}">
+                0.00 TND
+              </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Message si pas de médicaments -->
+            <div th:if="${commande != null and (commande.medicaments == null or commande.medicaments.empty)}" class="confirmation-message">
+                <i class="fas fa-info-circle"></i>
+                Aucun détail de produit disponible pour cette commande.
+            </div>
+
+            <!-- Total -->
+            <div class="order-total" th:if="${commande != null and commande.prixTotal != null}">
+                <div class="detail-item">
+                    <span><strong>Total de la commande:</strong></span>
+                    <span class="total-amount" th:text="${#numbers.formatDecimal(commande.prixTotal, 1, 2) + ' TND'}">Total</span>
+                </div>
+            </div>
         </div>
 
-        <!-- Message si pas de médicaments -->
-        <div th:if="${commande != null and (commande.medicaments == null or commande.medicaments.empty)}" class="confirmation-message">
-          <i class="fas fa-info-circle"></i>
-          Aucun détail de produit disponible pour cette commande.
+        <!-- Message de confirmation -->
+        <div class="confirmation-message">
+            <i class="fas fa-info-circle"></i>
+            Votre commande a été traitée avec succès. Le pharmacien vous contactera sous peu pour confirmer la livraison.
         </div>
 
-        <!-- Total -->
-        <div class="order-total" th:if="${commande != null and commande.prixTotal != null}">
-          <div class="detail-item">
-            <span><strong>Total de la commande:</strong></span>
-            <span class="total-amount" th:text="${#numbers.formatDecimal(commande.prixTotal, 1, 2) + ' TND'}">Total</span>
-          </div>
+        <!-- Boutons d'action -->
+        <div class="action-buttons">
+            <a th:href="@{/pharmacies}" class="btn btn-secondary">
+                <i class="fas fa-store"></i> Retour aux pharmacies
+            </a>
+            <a th:href="@{/accueil-utilisateur}" class="btn btn-primary">
+                <i class="fas fa-home"></i> Retour à l'accueil
+            </a>
         </div>
-      </div>
-
-      <!-- Message de confirmation -->
-      <div class="confirmation-message">
-        <i class="fas fa-info-circle"></i>
-        Votre commande a été traitée avec succès. Le pharmacien vous contactera sous peu pour confirmer la livraison.
-      </div>
-
-      <!-- Boutons d'action -->
-      <div class="action-buttons">
-        <a th:href="@{/pharmacies}" class="btn btn-secondary">
-          <i class="fas fa-store"></i> Retour aux pharmacies
-        </a>
-        <a th:href="@{/accueil-utilisateur}" class="btn btn-primary">
-          <i class="fas fa-home"></i> Retour à l'accueil
-        </a>
-      </div>
     </div>
-  </div>
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Vider le panier local storage
-    const pharmacieId = document.body.getAttribute('data-pharmacie-id');
+    document.addEventListener('DOMContentLoaded', function() {
+      // Vider le panier local storage
+      const pharmacieId = document.body.getAttribute('data-pharmacie-id');
 
-    if (pharmacieId) {
-      localStorage.removeItem('cart_' + pharmacieId);
-      console.log('Panier vidé pour la pharmacie ID:', pharmacieId);
-    } else {
-      // Vider tous les paniers si aucun ID spécifique
-      const keys = Object.keys(localStorage);
-      keys.forEach(key => {
-        if (key.startsWith('cart_')) {
-          localStorage.removeItem(key);
-        }
-      });
-      console.log('Tous les paniers ont été vidés');
-    }
-  });
+      if (pharmacieId) {
+        localStorage.removeItem('cart_' + pharmacieId);
+        console.log('Panier vidé pour la pharmacie ID:', pharmacieId);
+      } else {
+        // Vider tous les paniers si aucun ID spécifique
+        const keys = Object.keys(localStorage);
+        keys.forEach(key => {
+          if (key.startsWith('cart_')) {
+            localStorage.removeItem(key);
+          }
+        });
+        console.log('Tous les paniers ont été vidés');
+      }
+    });
 </script>
 </body>
 </html>

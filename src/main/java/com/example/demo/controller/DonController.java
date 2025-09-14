@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.model.Don;
 import com.example.demo.model.Medicament;
 import com.example.demo.model.StatutDon;
+import com.example.demo.model.Utilisateur;
 import com.example.demo.repository.DonRepository;
 import com.example.demo.repository.MedicamentRepository;
 import com.example.demo.repository.UtilisateurRepository;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import com.example.demo.model.Utilisateur;
 
 import java.io.IOException;
 import java.util.List;
@@ -28,11 +28,18 @@ public class DonController {
 
     @Autowired
     private MedicamentRepository medicamentRepository;
-    // Page Espace des Dons
+
+    // Page Espace des Dons - CORRIGÉ
     @GetMapping("/espace-dons")
-    public String espaceDons(HttpSession session) {
+    public String espaceDons(Model model, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) return "redirect:/login";
+
+        // Récupérer l'utilisateur connecté
+        Utilisateur utilisateur = utilisateurRepository.findById(userId).orElse(null);
+        if (utilisateur != null) {
+            model.addAttribute("utilisateur", utilisateur);
+        }
 
         return "utilisateur/espace-dons";
     }
@@ -42,6 +49,13 @@ public class DonController {
     public String listerDons(Model model, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         if(userId == null) return "redirect:/login";
+
+        // Récupérer l'utilisateur connecté
+        Utilisateur utilisateur = utilisateurRepository.findById(userId).orElse(null);
+        if (utilisateur != null) {
+            model.addAttribute("utilisateur", utilisateur);
+        }
+
         List<Don> mesDons = donRepository.findByMedicament_Utilisateur_IdAndStatut(userId, StatutDon.EN_COURS);
         model.addAttribute("mesDons", mesDons);
         return "utilisateur/mes-dons";
@@ -53,13 +67,18 @@ public class DonController {
         Long userId = (Long) session.getAttribute("userId");
         if(userId == null) return "redirect:/login";
 
+        // Récupérer l'utilisateur connecté
+        Utilisateur utilisateur = utilisateurRepository.findById(userId).orElse(null);
+        if (utilisateur != null) {
+            model.addAttribute("utilisateur", utilisateur);
+        }
+
         List<Medicament> medicaments = medicamentRepository.findByUtilisateurId(userId);
         model.addAttribute("don", new Don());
         model.addAttribute("medicaments", medicaments);
 
-        // CORRECTION : Utiliser "pharmacies" au lieu de "pharmacies.html"
         List<Utilisateur> pharmacies = utilisateurRepository.findByRoleId(3L);
-        model.addAttribute("pharmacies", pharmacies); // ← Changé de "pharmacies.html" à "pharmacies"
+        model.addAttribute("pharmacies", pharmacies);
 
         return "utilisateur/ajouter-don";
     }
@@ -100,6 +119,12 @@ public class DonController {
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) return "redirect:/login";
 
+        // Récupérer l'utilisateur connecté
+        Utilisateur utilisateur = utilisateurRepository.findById(userId).orElse(null);
+        if (utilisateur != null) {
+            model.addAttribute("utilisateur", utilisateur);
+        }
+
         Don don = donRepository.findById(id).orElse(null);
         if (don == null || !don.getMedicament().getUtilisateur().getId().equals(userId)) {
             return "redirect:/dons";
@@ -107,7 +132,7 @@ public class DonController {
 
         // récupérer les médicaments de l'utilisateur connecté
         List<Medicament> medicaments = medicamentRepository.findByUtilisateurId(userId);
-        // récupérer les pharmacies.html (les utilisateurs qui ont le rôle PHARMACIE)
+        // récupérer les pharmacies (les utilisateurs qui ont le rôle PHARMACIE)
         List<Utilisateur> pharmacies = utilisateurRepository.findByRoleId(3L);
         model.addAttribute("pharmacies", pharmacies);
 
@@ -151,7 +176,6 @@ public class DonController {
         return "redirect:/dons";
     }
 
-
     // Supprimer un don
     @GetMapping("/dons/supprimer/{id}")
     public String supprimer(@PathVariable Long id, HttpSession session) {
@@ -165,6 +189,7 @@ public class DonController {
 
         return "redirect:/dons";
     }
+
     // Affichage image
     @GetMapping("/dons/image/{id}")
     @ResponseBody
@@ -175,11 +200,4 @@ public class DonController {
         }
         return new byte[0];
     }
-
-
-
-
-
-
-
 }

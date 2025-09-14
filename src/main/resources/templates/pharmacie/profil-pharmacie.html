@@ -162,7 +162,7 @@
     <!-- Liens de navigation -->
     <div class="nav-links">
         <a th:href="@{/accueil-pharmacie}">Accueil</a>
-        <a th:href="@{/gestion-stock}">gestion de stock</a>
+        <a th:href="@{/pharmacie/{id}/gestion-stock(id=${utilisateur.id})}">Gestion de stock</a>
         <a th:href="@{/dons-pharmacie}">gestion des dons</a>
         <a th:href="@{/commande-pharmacie}">Commandes</a>
         <a th:href="@{/profil-pharmacie}">Profil</a>

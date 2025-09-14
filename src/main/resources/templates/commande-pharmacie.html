@@ -6,7 +6,12 @@
     <title>Commandes - Pharmacie | Dwaya</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <script src="https://kit.fontawesome.com/a2e0e6fa41.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Ajout de la balise meta pour le token CSRF avec valeur par défaut -->
+    <meta name="_csrf" th:content="${_csrf != null} ? ${_csrf.token} : ''"/>
+    <meta name="_csrf_header" th:content="${_csrf != null} ? ${_csrf.headerName} : ''"/>
     <style>
         :root {
             --primary-color: #1e6b77;
@@ -20,6 +25,8 @@
             --nav-hover: #1e6b77;
             --nav-text: #333333;
             --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --main-color: #74ebd5;
+            --second-color: #ACB6E5;
         }
 
         * {
@@ -30,62 +37,40 @@
 
         body {
             font-family: 'Roboto', sans-serif;
-            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
-            min-height: 100vh;
-            padding: 20px;
+            background: linear-gradient(135deg, var(--main-color), var(--second-color));
             color: var(--text-color);
-        }
-
-        /* Navigation Bar */
-        .navbar {
-            background: var(--nav-bg);
-            border-radius: 15px;
-            padding: 15px 30px;
-            margin-bottom: 30px;
-            box-shadow: var(--shadow);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .nav-logo {
-            width: 80px;
-            height: 80px;
-        }
-
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            gap: 30px;
-            margin: 0;
+            min-height: 100vh;
             padding: 0;
         }
 
-        .nav-item {
-            position: relative;
+        /* Navbar fixe */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
         }
 
-        .nav-link {
-            text-decoration: none;
-            color: var(--nav-text);
-            font-weight: 500;
-            padding: 10px 15px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
+        .logo-container {
             display: flex;
             align-items: center;
-            gap: 8px;
         }
 
-        .nav-link:hover,
-        .nav-link.active {
-            background: var(--nav-hover);
-            color: white;
-            transform: translateY(-2px);
+        .logo {
+            width: 110px;
+            height: 110px;
+            margin-bottom: 10px;
+            animation: float 3s ease-in-out infinite;
         }
 
-        .nav-link i {
-            font-size: 1.1rem;
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
         }
 
         .logout-btn {
@@ -96,7 +81,6 @@
             border-radius: 8px;
             cursor: pointer;
             transition: 0.3s;
-            font-weight: 500;
         }
 
         .logout-btn:hover {
@@ -104,16 +88,81 @@
             color: white;
         }
 
-        /* Main Content */
-        .main-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: var(--shadow);
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
         }
 
+        .nav-links a {
+            margin: 0 12px;
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--btn-hover);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .icon-links {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .icon-links svg {
+            width:50px;
+            height:50px;
+            fill: var(--btn-bg);
+            cursor: pointer;
+            transition: fill 0.3s;
+            margin:15px;
+        }
+
+        .icon-links svg:hover {
+            fill: var(--btn-hover);
+        }
+
+        /* NOUVEAU STYLE POUR LE NOM DE LA PHARMACIE */
+        .pharmacy-name {
+            font-weight: bold;
+            color: var(--main-color);
+            margin-left: 8px;
+            font-size: 16px;
+            padding: 5px 12px;
+            border-left: 2px solid #eee;
+        }
+
+        /* Contenu principal */
+        .main-content {
+            padding: 2rem;
+        }
+
+        .container {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1, h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #2c3e50;
+        }
+
+        /* Commandes */
         .commande-item {
             border: 1px solid #e9ecef;
             border-radius: 12px;
@@ -179,22 +228,46 @@
             border: none;
         }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .navbar {
+        /* Responsive */
+        @media (max-width: 992px) {
+            nav {
                 flex-direction: column;
-                gap: 15px;
-                padding: 15px;
+                padding: 15px 20px;
             }
 
-            .nav-menu {
+            .nav-links {
+                margin: 15px 0;
+            }
+
+            .nav-actions {
+                margin-top: 15px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
                 flex-direction: column;
                 gap: 10px;
-                width: 100%;
             }
 
-            .nav-link {
-                justify-content: center;
+            .nav-links a {
+                margin: 5px 0;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            /* Adaptation responsive du nom de pharmacie */
+            .pharmacy-name {
+                border-left: none;
+                border-top: 2px solid #eee;
+                padding-top: 10px;
+                margin: 10px 0 0 0;
                 text-align: center;
             }
 
@@ -208,20 +281,6 @@
                 width: 100%;
                 justify-content: center;
             }
-
-            .main-container {
-                padding: 20px;
-            }
-        }
-
-        /* Animations */
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-
-        .nav-logo {
-            animation: float 3s ease-in-out infinite;
         }
 
         /* Utilities */
@@ -237,166 +296,157 @@
             margin-top: 1.5rem;
         }
 
-        .mb-3 {
+        .mb-3, .mb-4 {
             margin-bottom: 1rem;
         }
     </style>
 </head>
 <body>
 
-<!-- Navigation Bar -->
-<nav class="navbar">
-    <img th:src="@{/logo.png}" alt="Logo Dwaya" class="nav-logo">
+<!-- Navbar identique à la page d'accueil -->
+<nav>
+    <!-- Logo -->
+    <div class="logo-container">
+        <img th:src="@{/logo.png}" alt="Logo Dwaya" class="logo">
+    </div>
 
-    <ul class="nav-menu">
-        <li class="nav-item">
-            <a th:href="@{/accueil-pharmacie}" class="nav-link">
-                <i class="fas fa-home"></i>
-                Accueil
-            </a>
-        </li>
-        <li class="nav-item">
-            <a th:href="@{/gestion-stock}" class="nav-link">
-                <i class="fas fa-boxes"></i>
-                gestion de stock
-            </a>
-        </li>
-        <li class="nav-item">
-            <a th:href="@{/dons-pharmacie}" class="nav-link">
-                <i class="fas fa-hand-holding-heart"></i>
-                Dons
-            </a>
-        </li>
-        <li class="nav-item">
-            <a th:href="@{/commande-pharmacie}" class="nav-link active">
-                <i class="fas fa-shopping-cart"></i>
-                Commandes
-            </a>
-        </li>
-        <li class="nav-item">
-            <a th:href="@{/profil-pharmacie}" class="nav-link">
-                <i class="fas fa-user"></i>
-                Profil
-            </a>
-        </li>
-    </ul>
+    <!-- Liens de navigation -->
+    <div class="nav-links">
+        <a th:href="@{/accueil-pharmacie}">Accueil</a>
+        <a th:href="@{/pharmacie/{id}/gestion-stock(id=${utilisateur.id})}">Gestion de stock</a>
+        <a th:href="@{/dons-pharmacie}">Gestion des dons</a>
+        <a th:href="@{/commande-pharmacie}">Commandes</a>
+        <a th:href="@{/profil-pharmacie}">Profil</a>
 
-    <form th:action="@{/logout}" method="post">
-        <button type="submit" class="logout-btn">
-            <i class="fas fa-sign-out-alt"></i> Déconnexion
-        </button>
-    </form>
-</nav>
+        <span class="pharmacy-name" th:text="${utilisateur != null ? utilisateur.nomPharmacie : 'Pharmacie'}">Nom Pharmacie</span>
+    </div>
 
-<div class="main-container">
-    <h2 class="mb-4">Gestion des Commandes</h2>
-
-    <ul class="nav nav-tabs" id="ordersTab" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab">
-                <i class="fas fa-clock"></i> Commandes en attente
-                <span class="badge bg-warning" th:text="${commandesEnAttente != null ? commandesEnAttente.size() : 0}">0</span>
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="archive-tab" data-bs-toggle="tab" data-bs-target="#archive" type="button" role="tab">
-                <i class="fas fa-archive"></i> Archives
-                <span class="badge bg-secondary" th:text="${commandesArchivees != null ? commandesArchivees.size() : 0}">0</span>
-            </button>
-        </li>
-    </ul>
-
-    <div class="tab-content mt-3" id="ordersTabContent">
-
-        <!-- Commandes en attente -->
-        <div class="tab-pane fade show active" id="pending" role="tabpanel">
-            <div th:if="${commandesEnAttente == null or commandesEnAttente.isEmpty()}">
-                <p class="text-center text-muted">Aucune commande en attente.</p>
-            </div>
-            <div th:each="commande : ${commandesEnAttente}" class="commande-item">
-                <div class="commande-header">
-                    <div>
-                        <strong th:text="'Commande #' + ${commande.id}"></strong>
-                        <span class="badge bg-warning" th:text="${commande.statut}">En attente</span>
-                    </div>
-                    <div class="commande-actions">
-                        <form th:action="@{/commande-pharmacie/{id}/valider(id=${commande.id})}" method="post">
-                            <button type="submit" class="btn btn-success btn-sm">
-                                <i class="fas fa-check"></i> Valider
-                            </button>
-                        </form>
-                        <form th:action="@{/commande-pharmacie/{id}/annuler(id=${commande.id})}" method="post">
-                            <button type="submit" class="btn btn-danger btn-sm">
-                                <i class="fas fa-times"></i> Annuler
-                            </button>
-                        </form>
-                    </div>
-                </div>
-                <div>
-                    <p><strong>Client :</strong> <span th:text="${commande.nom} + ' ' + ${commande.prenom}"></span></p>
-                    <p><strong>Adresse :</strong> <span th:text="${commande.adresse}"></span></p>
-                    <p><strong>Téléphone :</strong> <span th:text="${commande.telephone}"></span></p>
-                    <p><strong>Email :</strong> <span th:text="${commande.email}"></span></p>
-                    <p><strong>Date :</strong> <span th:text="${#temporals.format(commande.dateCommande, 'dd/MM/yyyy HH:mm')}"></span></p>
-
-                    <p><strong>Médicaments :</strong></p>
-                    <ul>
-                        <li th:each="med : ${commande.medicaments}">
-                            <span th:text="${med.nom}"></span> -
-                            <span th:text="${med.quantite}"></span> x
-                            <span th:text="${#numbers.formatDecimal(med.prix, 1, 2) + ' TND'}"></span>
-                            = <span th:text="${#numbers.formatDecimal(med.prix * med.quantite, 1, 2) + ' TND'}"></span>
-                        </li>
-                    </ul>
-
-                    <p><strong>Montant total :</strong> <span th:text="${#numbers.formatDecimal(commande.prixTotal, 1, 2) + ' TND'}"></span></p>
-
-                    <div th:if="${commande.notes != null and !commande.notes.isEmpty()}">
-                        <p><strong>Notes :</strong> <span th:text="${commande.notes}"></span></p>
-                    </div>
-                </div>
-            </div>
+    <!-- Icônes SVG + Déconnexion -->
+    <div class="nav-actions">
+        <div class="icon-links">
+            <!-- Icône de notification supprimée comme demandé -->
         </div>
 
-        <!-- Archives -->
-        <div class="tab-pane fade" id="archive" role="tabpanel">
-            <div th:if="${commandesArchivees == null or commandesArchivees.isEmpty()}">
-                <p class="text-center text-muted">Aucune commande archivée.</p>
-            </div>
-            <div th:each="commande : ${commandesArchivees}" class="commande-item">
-                <div class="commande-header">
+        <form th:action="@{/logout}" method="post">
+            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit" class="logout-btn">Déconnexion</button>
+        </form>
+    </div>
+</nav>
+
+<!-- Contenu principal -->
+<div class="main-content">
+    <div class="container">
+        <h2>Gestion des Commandes</h2>
+
+        <ul class="nav nav-tabs" id="ordersTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab">
+                    <i class="fas fa-clock"></i> Commandes en attente
+                    <span class="badge bg-warning" th:text="${commandesEnAttente != null ? commandesEnAttente.size() : 0}">0</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="archive-tab" data-bs-toggle="tab" data-bs-target="#archive" type="button" role="tab">
+                    <i class="fas fa-archive"></i> Archives
+                    <span class="badge bg-secondary" th:text="${commandesArchivees != null ? commandesArchivees.size() : 0}">0</span>
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content mt-3" id="ordersTabContent">
+
+            <!-- Commandes en attente -->
+            <div class="tab-pane fade show active" id="pending" role="tabpanel">
+                <div th:if="${commandesEnAttente == null or commandesEnAttente.isEmpty()}">
+                    <p class="text-center text-muted">Aucune commande en attente.</p>
+                </div>
+                <div th:each="commande : ${commandesEnAttente}" class="commande-item">
+                    <div class="commande-header">
+                        <div>
+                            <strong th:text="'Commande #' + ${commande.id}"></strong>
+                            <span class="badge bg-warning" th:text="${commande.statut}">En attente</span>
+                        </div>
+                        <div class="commande-actions">
+                            <form th:action="@{/commande-pharmacie/{id}/valider(id=${commande.id})}" method="post">
+                                <button type="submit" class="btn btn-success btn-sm">
+                                     Valider
+                                </button>
+                            </form>
+                            <form th:action="@{/commande-pharmacie/{id}/annuler(id=${commande.id})}" method="post">
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                     Annuler
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                     <div>
-                        <strong th:text="'Commande #' + ${commande.id}"></strong>
-                        <span th:if="${commande.statut == 'VALIDEE'}" class="badge bg-success" th:text="${commande.statut}">Validée</span>
-                        <span th:if="${commande.statut == 'ANNULEE'}" class="badge bg-secondary" th:text="${commande.statut}">Annulée</span>
+                        <p><strong>Client :</strong> <span th:text="${commande.nom} + ' ' + ${commande.prenom}"></span></p>
+                        <p><strong>Adresse :</strong> <span th:text="${commande.adresse}"></span></p>
+                        <p><strong>Téléphone :</strong> <span th:text="${commande.telephone}"></span></p>
+                        <p><strong>Email :</strong> <span th:text="${commande.email}"></span></p>
+                        <p><strong>Date :</strong> <span th:text="${#temporals.format(commande.dateCommande, 'dd/MM/yyyy HH:mm')}"></span></p>
+
+                        <p><strong>Médicaments :</strong></p>
+                        <ul>
+                            <li th:each="med : ${commande.medicaments}">
+                                <span th:text="${med.nom}"></span> -
+                                <span th:text="${med.quantite}"></span> x
+                                <span th:text="${#numbers.formatDecimal(med.prix, 1, 2) + ' TND'}"></span>
+                                = <span th:text="${#numbers.formatDecimal(med.prix * med.quantite, 1, 2) + ' TND'}"></span>
+                            </li>
+                        </ul>
+
+                        <p><strong>Montant total :</strong> <span th:text="${#numbers.formatDecimal(commande.prixTotal, 1, 2) + ' TND'}"></span></p>
+
+                        <div th:if="${commande.notes != null and !commande.notes.isEmpty()}">
+                            <p><strong>Notes :</strong> <span th:text="${commande.notes}"></span></p>
+                        </div>
                     </div>
                 </div>
-                <div>
-                    <p><strong>Client :</strong> <span th:text="${commande.nom} + ' ' + ${commande.prenom}"></span></p>
-                    <p><strong>Adresse :</strong> <span th:text="${commande.adresse}"></span></p>
-                    <p><strong>Téléphone :</strong> <span th:text="${commande.telephone}"></span></p>
-                    <p><strong>Email :</strong> <span th:text="${commande.email}"></span></p>
-                    <p><strong>Date :</strong> <span th:text="${#temporals.format(commande.dateCommande, 'dd/MM/yyyy HH:mm')}"></span></p>
+            </div>
 
-                    <p><strong>Médicaments :</strong></p>
-                    <ul>
-                        <li th:each="med : ${commande.medicaments}">
-                            <span th:text="${med.nom}"></span> -
-                            <span th:text="${med.quantite}"></span> x
-                            <span th:text="${#numbers.formatDecimal(med.prix, 1, 2) + ' TND'}"></span>
-                            = <span th:text="${#numbers.formatDecimal(med.prix * med.quantite, 1, 2) + ' TND'}"></span>
-                        </li>
-                    </ul>
+            <!-- Archives -->
+            <div class="tab-pane fade" id="archive" role="tabpanel">
+                <div th:if="${commandesArchivees == null or commandesArchivees.isEmpty()}">
+                    <p class="text-center text-muted">Aucune commande archivée.</p>
+                </div>
+                <div th:each="commande : ${commandesArchivees}" class="commande-item">
+                    <div class="commande-header">
+                        <div>
+                            <strong th:text="'Commande #' + ${commande.id}"></strong>
+                            <span th:if="${commande.statut == 'VALIDEE'}" class="badge bg-success" th:text="${commande.statut}">Validée</span>
+                            <span th:if="${commande.statut == 'ANNULEE'}" class="badge bg-secondary" th:text="${commande.statut}">Annulée</span>
+                        </div>
+                    </div>
+                    <div>
+                        <p><strong>Client :</strong> <span th:text="${commande.nom} + ' ' + ${commande.prenom}"></span></p>
+                        <p><strong>Adresse :</strong> <span th:text="${commande.adresse}"></span></p>
+                        <p><strong>Téléphone :</strong> <span th:text="${commande.telephone}"></span></p>
+                        <p><strong>Email :</strong> <span th:text="${commande.email}"></span></p>
+                        <p><strong>Date :</strong> <span th:text="${#temporals.format(commande.dateCommande, 'dd/MM/yyyy HH:mm')}"></span></p>
 
-                    <p><strong>Montant total :</strong> <span th:text="${#numbers.formatDecimal(commande.prixTotal, 1, 2) + ' TND'}"></span></p>
+                        <p><strong>Médicaments :</strong></p>
+                        <ul>
+                            <li th:each="med : ${commande.medicaments}">
+                                <span th:text="${med.nom}"></span> -
+                                <span th:text="${med.quantite}"></span> x
+                                <span th:text="${#numbers.formatDecimal(med.prix, 1, 2) + ' TND'}"></span>
+                                = <span th:text="${#numbers.formatDecimal(med.prix * med.quantite, 1, 2) + ' TND'}"></span>
+                            </li>
+                        </ul>
 
-                    <div th:if="${commande.notes != null and !commande.notes.isEmpty()}">
-                        <p><strong>Notes :</strong> <span th:text="${commande.notes}"></span></p>
+                        <p><strong>Montant total :</strong> <span th:text="${#numbers.formatDecimal(commande.prixTotal, 1, 2) + ' TND'}"></span></p>
+
+                        <div th:if="${commande.notes != null and !commande.notes.isEmpty()}">
+                            <p><strong>Notes :</strong> <span th:text="${commande.notes}"></span></p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

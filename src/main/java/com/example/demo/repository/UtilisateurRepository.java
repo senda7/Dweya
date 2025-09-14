@@ -63,4 +63,5 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateur, Long> 
 
     long countByTypeUtilisateurAndEtat(TypeUtilisateur typeUtilisateur, boolean etat);
 
+    Optional<Utilisateur> findFirstByEmailAndMotDePasse(String email, String motDePasse);
 }
