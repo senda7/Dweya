@@ -1,7 +1,6 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
 
 @Entity
 @Table(name = "stock")
@@ -9,8 +8,6 @@ public class Medpharmacie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "date_peremption")
-    private LocalDate datePeremption;
 
     @Column(nullable = false)
     private String nom;
@@ -87,6 +84,4 @@ public class Medpharmacie {
 
     public Utilisateur getPharmacie() { return pharmacie; }
     public void setPharmacie(Utilisateur pharmacie) { this.pharmacie = pharmacie; }
-    public LocalDate getDatePeremption() { return datePeremption; }
-    public void setDatePeremption(LocalDate datePeremption) { this.datePeremption = datePeremption; }
 }

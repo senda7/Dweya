@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Accueil</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root {
           --main-color: #74ebd5;
@@ -122,13 +121,15 @@
           color: var(--btn-hover);
         }
 
+        /* Style pour le nom de l'utilisateur */
         .user-name {
-          font-weight: bold;
-          color: var(--main-color);
-          margin-left: 8px;
-          font-size: 16px;
-          padding: 5px 12px;
-          border-left: 2px solid #eee;
+          background-color: var(--user-color);
+          color: white;
+          padding: 8px 16px;
+          border-radius: 20px;
+          font-weight: 500;
+          margin-left: 10px;
+          font-size: 14px;
         }
 
         .nav-actions {
@@ -143,38 +144,17 @@
           gap: 15px;
         }
 
-        .icon-links a {
-          position: relative;
-          display: inline-block;
-        }
-
         .icon-links svg {
-          width: 24px;
-          height: 24px;
+          width: 50px;
+          height: 50px;
           fill: var(--btn-bg);
           cursor: pointer;
           transition: fill 0.3s;
+          margin: 15px;
         }
 
         .icon-links svg:hover {
           fill: var(--btn-hover);
-        }
-
-        /* Styles pour le badge de notification */
-        .notification-badge {
-          position: absolute;
-          top: -8px;
-          right: -8px;
-          background-color: #dc3545;
-          color: white;
-          border-radius: 50%;
-          width: 20px;
-          height: 20px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 0.7rem;
-          font-weight: bold;
         }
 
         /* Responsive */
@@ -191,54 +171,6 @@
           .user-name {
             margin: 10px 0;
           }
-
-          .icon-links {
-            margin-top: 10px;
-          }
-        }
-
-        /* Section fonctionnalités */
-        .features {
-          padding: 60px 20px;
-          background: linear-gradient(135deg, var(--main-color), var(--second-color));
-        }
-
-        .feature-card {
-          background: white;
-          border-radius: 15px;
-          padding: 30px;
-          text-align: center;
-          box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-          transition: transform 0.3s ease;
-          height: 100%;
-        }
-
-        .feature-card:hover {
-          transform: translateY(-5px);
-        }
-
-        .feature-icon {
-          font-size: 3rem;
-          color: var(--main-color);
-          margin-bottom: 20px;
-        }
-
-        /* Section statistiques */
-        .stats {
-          padding: 60px 20px;
-          background: white;
-        }
-
-        .stat-item {
-          text-align: center;
-          padding: 20px;
-        }
-
-        .stat-number {
-          font-size: 2.5rem;
-          font-weight: bold;
-          color: var(--main-color);
-          margin-bottom: 10px;
         }
     </style>
 </head>
@@ -260,23 +192,18 @@
         <a th:href="@{/pharmacies}">Pharmacies</a>
         <a th:href="@{/profil-utilisateur}">Profil</a>
 
-        <!-- Nom de l'utilisateur -->
-        <span class="user-name" th:text="${utilisateur != null ? utilisateur.prenom + ' ' + utilisateur.nom : 'Utilisateur'}">Prénom Nom</span>
+        <!-- Nom de l'utilisateur ajouté ici -->
+        <span class="user-name" th:text="${utilisateur.prenom} + ' ' + ${utilisateur.nom}">Prénom Nom</span>
     </div>
 
     <!-- Icônes SVG + Déconnexion -->
     <div class="nav-actions">
         <div class="icon-links">
-            <!-- Notification avec badge -->
-            <a th:href="@{/notifications}" title="Notifications" class="position-relative">
-                <svg viewBox="0 0 24 24">
-                    <path d="M12 2C10.34 2 9 3.34 9 5v1.07C6.16 6.56 4 8.92 4 12v5l-1 1v1h18v-1l-1-1v-5c0-3.08-2.16-5.44-5-5.93V5c0-1.66-1.34-3-3-3zM12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2z"/>
-                </svg>
-                <!-- Badge pour notifications non lues -->
-                <span th:if="${unreadCount != null && unreadCount > 0}"
-                      class="notification-badge"
-                      th:text="${unreadCount}">
-                </span>
+            <!-- Notification -->
+            <a th:href="@{/notifications}" title="Notifications">
+                <svg viewBox="0 0 24 24"><path d="M12 2C10.34 2 9 3.34 9 5v1.07C6.16
+        6.56 4 8.92 4 12v5l-1 1v1h18v-1l-1-1v-5c0-3.08-2.16-5.44-5-5.93V5c0-1.66-1.34-3-3-3zM12
+        22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2z"/></svg>
             </a>
         </div>
 
@@ -292,81 +219,9 @@
     <p>
         Gérez vos médicaments, recevez des rappels de prise,<br>
         faites des dons en toute sécurité, et commandez facilement <br>
-        via les pharmacies.<br>Utilisez le menu ci-dessus pour naviguer entre les différentes sections.
+        via les pharmacies.<br>utilisez le menu ci-dessus pour naviguer entre les différentes sections.
     </p>
 </section>
 
-<!-- Section Fonctionnalités -->
-<section class="features">
-    <div class="container">
-        <h2 class="text-center mb-5" style="color: white;">Nos Services</h2>
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="feature-card">
-                    <div class="feature-icon">💊</div>
-                    <h3>Gestion des Médicaments</h3>
-                    <p>Ajoutez, modifiez et suivez vos médicaments facilement avec notre système intuitif.</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="feature-card">
-                    <div class="feature-icon">⏰</div>
-                    <h3>Rappels Intelligents</h3>
-                    <p>Ne manquez jamais une prise avec nos rappels personnalisés et notifications.</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="feature-card">
-                    <div class="feature-icon">🤝</div>
-                    <h3>Dons Sécurisés</h3>
-                    <p>Donnez vos médicaments non utilisés à ceux qui en ont besoin, en toute sécurité.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Section Statistiques -->
-<section class="stats">
-    <div class="container">
-        <h2 class="text-center mb-5">Votre Activité</h2>
-        <div class="row">
-            <div class="col-md-3">
-                <div class="stat-item">
-                    <div class="stat-number" th:text="${statistics != null ? statistics.medicamentCount : '0'}">0</div>
-                    <p>Médicaments</p>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-item">
-                    <div class="stat-number" th:text="${statistics != null ? statistics.donCount : '0'}">0</div>
-                    <p>Dons Effectués</p>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-item">
-                    <div class="stat-number" th:text="${unreadCount != null ? unreadCount : '0'}">0</div>
-                    <p>Notifications</p>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-item">
-                    <div class="stat-number" th:text="${statistics != null ? statistics.rappelCount : '0'}">0</div>
-                    <p>Rappels Actifs</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Footer -->
-<footer style="background-color: #f8f9fa; padding: 40px 0; text-align: center;">
-    <div class="container">
-        <p>&copy; 2024 Dwaya. Tous droits réservés.</p>
-        <p>Prenez soin de votre santé, nous nous occupons du reste.</p>
-    </div>
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

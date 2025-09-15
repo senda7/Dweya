@@ -16,7 +16,6 @@
           --btn-bg: #74ebd5;
           --btn-hover: #5fc9bb;
           --text-color: #333;
-          --main-color: #74ebd5; /* Ajout de cette variable */
         }
 
         * {
@@ -61,34 +60,16 @@
           50% { transform: translateY(-8px); }
         }
 
-        .nav-links {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          flex-wrap: wrap;
-          gap: 15px;
-        }
-
         .nav-links a {
+          margin: 0 12px;
           text-decoration: none;
           color: var(--text-color);
           font-weight: 500;
           transition: color 0.3s;
-          padding: 8px 12px;
         }
 
         .nav-links a:hover {
           color: var(--btn-hover);
-        }
-
-        /* Style amélioré pour le nom de l'utilisateur */
-        .user-name {
-          font-weight: bold;
-          color: var(--main-color);
-          margin-left: 8px;
-          font-size: 16px;
-          padding: 5px 12px;
-          border-left: 2px solid #eee;
         }
 
         .logout-btn {
@@ -199,6 +180,11 @@
           align-items: center;
         }
 
+        .pharmacy-info::before {
+          content: "⏰";
+          margin-right: 8px;
+        }
+
         .view-stock-btn {
           display: block;
           width: 100%;
@@ -234,14 +220,6 @@
 
           .nav-links {
             margin: 15px 0;
-            flex-direction: column;
-          }
-
-          .user-name {
-            margin: 10px 0;
-            border-left: none;
-            border-top: 2px solid #eee;
-            padding-top: 10px;
           }
 
           .search-container {
@@ -258,7 +236,7 @@
 <!-- Navbar -->
 <nav>
     <div class="logo-container">
-        <img th:src="@{/logo.png}" alt="Logo Dwaya" class="logo">
+        <img th:src="@{/logo.png}" src="https://via.placeholder.com/110x110/74ebd5/1e6b77?text=Dwaya" alt="Logo Dwaya" class="logo">
     </div>
 
     <div class="nav-links">
@@ -268,9 +246,6 @@
         <a th:href="@{/espace-dons}">Dons</a>
         <a th:href="@{/pharmacies}" style="color: var(--btn-hover);">Pharmacies</a>
         <a th:href="@{/profil-utilisateur}">Profil</a>
-
-        <!-- Nom de l'utilisateur avec style amélioré -->
-        <span class="user-name" style="color: #74ebd5 !important;" th:text="${utilisateur != null ? utilisateur.prenom + ' ' + utilisateur.nom : 'Utilisateur'}">Prénom Nom</span>
     </div>
 
     <form th:action="@{/logout}" method="post">

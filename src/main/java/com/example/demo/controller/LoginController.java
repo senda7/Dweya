@@ -10,6 +10,7 @@ import com.example.demo.service.NotificationService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,12 +18,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.IOException;
-import java.util.Optional;
+
 
 @Controller
 public class LoginController {
     @Autowired
     private NotificationService notificationService;
+
 
     @Autowired
     private AuthService authService;
@@ -52,15 +54,11 @@ public class LoginController {
         Utilisateur u = null;
 
         if (email != null && motDePasse != null) {
-            // Login via AuthService (méthode recommandée)
+            // Login via AuthService
             u = authService.login(email, motDePasse);
         } else if (utilisateur.getEmail() != null && utilisateur.getMotDePasse() != null) {
-            // Login via repository - CORRIGÉ : Utiliser la méthode utilitaire
-            Optional<Utilisateur> utilisateurOpt = utilisateurRepository.findFirstByEmailAndMotDePasse(
-                    utilisateur.getEmail(),
-                    utilisateur.getMotDePasse()
-            );
-            u = utilisateurOpt.orElse(null);
+            // Login via repository
+            u = utilisateurRepository.findByEmailAndMotDePasse(utilisateur.getEmail(), utilisateur.getMotDePasse());
         }
 
         if (u != null && u.isEtat()) {
@@ -138,13 +136,6 @@ public class LoginController {
         } catch (IOException e) {
             e.printStackTrace();
             model.addAttribute("erreur", "Erreur lors du traitement des fichiers.");
-            model.addAttribute("roles", roleRepository.findAll());
-            return "register";
-        }
-
-        // Vérifier si l'email existe déjà
-        if (utilisateurRepository.existsByEmail(utilisateur.getEmail())) {
-            model.addAttribute("erreur", "Cet email est déjà utilisé.");
             model.addAttribute("roles", roleRepository.findAll());
             return "register";
         }

@@ -74,27 +74,6 @@
 
     .post-card { border: 1px solid #ddd; border-radius: 15px; padding: 20px; margin-bottom: 20px; background: #f9f9f9; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; gap: 20px; align-items: center; }
     .post-card img { border-radius: 10px; object-fit: cover; width: 150px; height: 120px; }
-
-  .don-text {
-    text-align: center;
-    font-size: 1.2rem;
-    font-weight: 500;
-    background: linear-gradient(90deg, #1e6b77, #74ebd5, #ACB6E5);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: fadeIn 2s ease-in-out, gradientMove 5s infinite alternate;
-    margin-bottom: 25px;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes gradientMove {
-    from { background-position: 0% 50%; }
-    to { background-position: 100% 50%; }
-  }
   </style>
 </head>
 <body>
@@ -108,7 +87,6 @@
       <i class="fas fa-arrow-left me-2"></i> Retour
     </a>
   </div>
-    <p class="don-text">Ici, vous trouverez la liste des médicaments que les utilisateurs souhaitent donner. En tant que pharmacien, vous pouvez accepter ou refuser chaque don selon l’état du médicament.</p>
 
   <div th:each="don : ${tousLesDons}" class="post-card">
     <img th:if="${don.image != null}" th:src="@{'/dons/image/' + ${don.id}}" alt="Image du médicament"/>

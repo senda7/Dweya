@@ -15,7 +15,7 @@
 </head>
 <body>
 <div class="container">
-  <h2 class="mb-4 text-center">Ajouter un médicament  </h2>
+  <h2 class="mb-4 text-center">Ajouter un médicament - Pharmacie <span th:text="${pharmacieId}"></span></h2>
 
   <!-- Messages de succès/erreur depuis les paramètres URL -->
   <div th:if="${param.success != null}" class="alert alert-success">
@@ -42,11 +42,6 @@
       <label class="form-label">Quantité *</label>
       <input type="number" name="quantite" class="form-control" min="0" required/>
     </div>
-      <div class="mb-3">
-          <label class="form-label">Date de péremption</label>
-          <input type="date" name="datePeremption" class="form-control"/>
-          <small class="text-muted">Format: JJ/MM/AAAA</small>
-      </div>
 
     <div class="mb-3">
       <label class="form-label">Description</label>

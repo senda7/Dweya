@@ -71,27 +71,6 @@
       width: 200px;
       height: 150px;
     }
-
-  .don-text {
-    text-align: center;
-    font-size: 1.2rem;
-    font-weight: 500;
-    background: linear-gradient(90deg, #1e6b77, #74ebd5, #ACB6E5);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: fadeIn 2s ease-in-out, gradientMove 5s infinite alternate;
-    margin-bottom: 25px;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes gradientMove {
-    from { background-position: 0% 50%; }
-    to { background-position: 100% 50%; }
-  }
   </style>
 </head>
 <body>
@@ -110,7 +89,6 @@
       + Ajouter un don
     </a>
   </div>
-    <p class="don-text">Déposez ici vos médicaments non utilisés pour en faire don à d’autres utilisateurs.</p>
 
   <!-- Liste des dons -->
   <div th:each="don : ${mesDons}" class="post-card">

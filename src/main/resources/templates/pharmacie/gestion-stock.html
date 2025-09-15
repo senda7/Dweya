@@ -121,16 +121,6 @@
           fill: var(--btn-hover);
         }
 
-        /* NOUVEAU STYLE POUR LE NOM DE LA PHARMACIE */
-        .pharmacy-name {
-          font-weight: bold;
-          color: var(--main-color);
-          margin-left: 8px;
-          font-size: 16px;
-          padding: 5px 12px;
-          border-left: 2px solid #eee;
-        }
-
         /* Contenu principal */
         .main-content {
           padding: 2rem;
@@ -260,15 +250,6 @@
           .container {
             padding: 1rem;
           }
-
-          /* Adaptation responsive du nom de pharmacie */
-          .pharmacy-name {
-            border-left: none;
-            border-top: 2px solid #eee;
-            padding-top: 10px;
-            margin: 10px 0 0 0;
-            text-align: center;
-          }
         }
     </style>
 </head>
@@ -289,14 +270,18 @@
         <a th:href="@{/dons-pharmacie}">Gestion des dons</a>
         <a th:href="@{/commande-pharmacie}">Commandes</a>
         <a th:href="@{/profil-pharmacie}">Profil</a>
-
-        <span class="pharmacy-name" th:text="${utilisateur != null ? utilisateur.nomPharmacie : 'Pharmacie'}">Nom Pharmacie</span>
     </div>
 
     <!-- Icônes SVG + Déconnexion -->
     <div class="nav-actions">
         <div class="icon-links">
-            <!-- Icône de notification supprimée comme demandé -->
+            <!-- Notification avec badge - avec vérification de l'existence de la variable -->
+            <a th:href="@{${pharmacieId != null} ? '/pharmacie/' + ${pharmacieId} + '/gestion-stock' : '#'}" title="Notifications">
+                <svg viewBox="0 0 24 24"><path d="M12 2C10.34 2 9 3.34 9 5v1.07C6.16
+        6.56 4 8.92 4 12v5l-1 1v1h18v-1l-1-1v-5c0-3.08-2.16-5.44-5-5.93V5c0-1.66-1.34-3-3-3zM12
+        22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2z"/></svg>
+                <span th:if="${unreadCount != null and unreadCount > 0}" style="color: red; font-weight: bold; margin-left: -5px;">(<span th:text="${unreadCount}"></span>)</span>
+            </a>
         </div>
 
         <form th:action="@{/logout}" method="post">
@@ -309,7 +294,7 @@
 <!-- Contenu principal -->
 <div class="main-content">
     <div class="container">
-        <h1>Gestion de stock - <span th:text="${utilisateur != null} ? ${utilisateur.nomPharmacie} : 'Pharmacie'"></span></h1>
+        <h1>Gestion de stock  </h1>
 
         <div class="d-flex justify-content-between align-items-center mb-3">
             <!-- LIEN avec vérification de pharmacieId -->
@@ -328,7 +313,7 @@
             <table class="table table-striped table-hover">
                 <thead>
                 <tr>
-                    <th>ID</th><th>Photo</th><th>Nom</th><th>Prix</th><th>Quantité</th><th>Date de péremption</th><th>Description</th><th>Ordonnance</th><th>Actions</th>
+                    <th>ID</th><th>Photo</th><th>Nom</th><th>Prix</th><th>Quantité</th><th>Description</th><th>Ordonnance</th><th>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -350,15 +335,6 @@
                     <td th:text="${medicament.nom}"></td>
                     <td th:text="${medicament.prix != null} ? ${#numbers.formatDecimal(medicament.prix,1,2)} + ' dt' : 'N/A'"></td>
                     <td th:text="${medicament.quantite}" th:classappend="${medicament.quantite != null and medicament.quantite < 10} ? 'low-stock' : ''"></td>
-
-                    <!-- NOUVEAU: Date de péremption -->
-                    <td>
-                        <span th:if="${medicament.datePeremption != null}"
-                              th:text="${#temporals.format(medicament.datePeremption, 'dd/MM/yyyy')}">
-                        </span>
-                        <span th:if="${medicament.datePeremption == null}">-</span>
-                    </td>
-
                     <td th:text="${medicament.description} ?: '-'"></td>
                     <td>
                         <span th:if="${medicament.ordonnanceRequise != null and medicament.ordonnanceRequise}" class="badge bg-danger">Oui</span>
@@ -375,7 +351,7 @@
                     </td>
                 </tr>
                 <tr th:if="${medicaments == null or medicaments.empty}">
-                    <td colspan="9" class="text-center">Aucun médicament en stock.</td>
+                    <td colspan="8" class="text-center">Aucun médicament en stock.</td>
                 </tr>
                 </tbody>
             </table>

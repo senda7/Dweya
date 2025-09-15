@@ -26,6 +26,7 @@ public class CommandeController {
     private CommandeService commandeService;
 
     // ======= PAGE DES COMMANDES =======
+    // ======= PAGE DES COMMANDES =======
     @GetMapping("/commande-pharmacie")
     public String showCommandes(Model model, HttpSession session,
                                 @RequestParam(value = "pharmacieId", required = false) Long pharmacieIdParam) {
@@ -38,11 +39,6 @@ public class CommandeController {
             if (utilisateur == null) {
                 return "redirect:/login";
             }
-
-            // AJOUT: Ajouter l'utilisateur et le nom de la pharmacie au modèle
-            model.addAttribute("utilisateur", utilisateur);
-            model.addAttribute("nomPharmacie", utilisateur.getNomPharmacie());
-            model.addAttribute("pharmacie", utilisateur);
 
             // Déterminer la pharmacie à afficher - utiliser une variable final
             final Long pharmacieId;
@@ -85,6 +81,7 @@ public class CommandeController {
 
             model.addAttribute("commandesEnAttente", commandesEnAttente);
             model.addAttribute("commandesArchivees", commandesArchivees);
+            model.addAttribute("pharmacie", utilisateur);
 
             // Info de débogage
             String debugInfo = String.format(
@@ -108,7 +105,7 @@ public class CommandeController {
 
     // ======= VALIDER UNE COMMANDE =======
     @PostMapping("/commande-pharmacie/{id}/valider")
-    public String validerCommande(@PathVariable Long id, HttpSession session, Model model) {
+    public String validerCommande(@PathVariable Long id, HttpSession session) {
         try {
             // Récupérer l'utilisateur connecté depuis la session
             Utilisateur utilisateur = (Utilisateur) session.getAttribute("utilisateurConnecte");
@@ -116,10 +113,6 @@ public class CommandeController {
             if (utilisateur == null) {
                 return "redirect:/login";
             }
-
-            // AJOUT: Ajouter l'utilisateur et le nom de la pharmacie au modèle
-            model.addAttribute("utilisateur", utilisateur);
-            model.addAttribute("nomPharmacie", utilisateur.getNomPharmacie());
 
             Long pharmacieId = utilisateur.getId();
 
@@ -141,7 +134,7 @@ public class CommandeController {
 
     // ======= ANNULER UNE COMMANDE =======
     @PostMapping("/commande-pharmacie/{id}/annuler")
-    public String annulerCommande(@PathVariable Long id, HttpSession session, Model model) {
+    public String annulerCommande(@PathVariable Long id, HttpSession session) {
         try {
             // Récupérer l'utilisateur connecté depuis la session
             Utilisateur utilisateur = (Utilisateur) session.getAttribute("utilisateurConnecte");
@@ -149,10 +142,6 @@ public class CommandeController {
             if (utilisateur == null) {
                 return "redirect:/login";
             }
-
-            // AJOUT: Ajouter l'utilisateur et le nom de la pharmacie au modèle
-            model.addAttribute("utilisateur", utilisateur);
-            model.addAttribute("nomPharmacie", utilisateur.getNomPharmacie());
 
             Long pharmacieId = utilisateur.getId();
 
@@ -174,7 +163,7 @@ public class CommandeController {
 
     // ======= CRÉER UNE COMMANDE DE TEST =======
     @GetMapping("/commande-test")
-    public String creerCommandeTest(HttpSession session, Model model) {
+    public String creerCommandeTest(HttpSession session) {
         try {
             // Récupérer l'utilisateur connecté depuis la session
             Utilisateur utilisateur = (Utilisateur) session.getAttribute("utilisateurConnecte");
@@ -182,10 +171,6 @@ public class CommandeController {
             if (utilisateur == null) {
                 return "redirect:/login";
             }
-
-            // AJOUT: Ajouter l'utilisateur et le nom de la pharmacie au modèle
-            model.addAttribute("utilisateur", utilisateur);
-            model.addAttribute("nomPharmacie", utilisateur.getNomPharmacie());
 
             Long pharmacieId = utilisateur.getId();
 
