@@ -36,7 +36,7 @@
 </head>
 <body>
 <div class="container mt-5">
-    <h2 class="mb-4 text-center">Modifier un Médicament - Pharmacie <span th:text="${pharmacieId}"></span></h2>
+    <h2 class="mb-4 text-center">Modifier un Médicament </h2>
 
     <!-- Messages de succès / erreur -->
     <div th:if="${param.success != null}" class="alert alert-success">
@@ -67,6 +67,11 @@
         <div class="mb-3">
             <label for="quantite" class="form-label">Quantité *</label>
             <input type="number" id="quantite" name="quantite" th:value="${medicament.quantite}" class="form-control" required min="0"/>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Date de péremption</label>
+            <input type="date" name="datePeremption" class="form-control"/>
+            <small class="text-muted">Format: JJ/MM/AAAA</small>
         </div>
 
         <!-- Description -->

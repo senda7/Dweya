@@ -16,6 +16,7 @@
           --btn-bg: #74ebd5;
           --btn-hover: #5fc9bb;
           --text-color: #333;
+          --main-color: #74ebd5;
         }
 
         * {
@@ -59,6 +60,13 @@
           50% { transform: translateY(-8px); }
         }
 
+        .nav-links {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-wrap: wrap;
+        }
+
         .nav-links a {
           margin: 0 12px;
           text-decoration: none;
@@ -69,6 +77,16 @@
 
         .nav-links a:hover {
           color: var(--btn-hover);
+        }
+
+        /* NOUVEAU STYLE POUR LE NOM DE LA PHARMACIE */
+        .pharmacy-name {
+          font-weight: bold;
+          color: var(--main-color);
+          margin-left: 8px;
+          font-size: 16px;
+          padding: 5px 12px;
+          border-left: 2px solid #eee;
         }
 
         .logout-btn {
@@ -121,6 +139,32 @@
           transform: translateY(-3px);
         }
 
+        /* Responsive */
+        @media (max-width: 768px) {
+          nav {
+            flex-direction: column;
+            padding: 15px 20px;
+          }
+
+          .nav-links {
+            margin: 15px 0;
+            flex-direction: column;
+            gap: 10px;
+          }
+
+          .nav-links a {
+            margin: 5px 0;
+          }
+
+          /* Adaptation responsive du nom de pharmacie */
+          .pharmacy-name {
+            border-left: none;
+            border-top: 2px solid #eee;
+            padding-top: 10px;
+            margin: 10px 0 0 0;
+            text-align: center;
+          }
+        }
     </style>
 </head>
 <body>
@@ -133,10 +177,13 @@
 
     <div class="nav-links">
         <a th:href="@{/accueil-pharmacie}">Accueil</a>
-        <a th:href="@{/gestion-stock}">gestion de stock</a>
-        <a th:href="@{/dons-pharmacie}">gestion des dons</a>
+        <a th:href="@{/pharmacie/{id}/gestion-stock(id=${utilisateur.id})}">Gestion de stock</a>
+        <a th:href="@{/dons-pharmacie}">Gestion des dons</a>
         <a th:href="@{/commande-pharmacie}">Commandes</a>
         <a th:href="@{/profil-pharmacie}">Profil</a>
+
+        <!-- NOUVEAU: AFFICHAGE DU NOM DE LA PHARMACIE -->
+        <span class="pharmacy-name" th:text="${utilisateur != null} ? ${utilisateur.nomPharmacie} : 'Pharmacie'">Nom Pharmacie</span>
     </div>
 
     <form th:action="@{/logout}" method="post">
@@ -146,7 +193,7 @@
 
 <!-- Contenu de la page Dons -->
 <div class="container">
-    <h2 class="section-title">Espace des Dons</h2>
+    <h2 class="section-title">Espace des Dons - <span th:text="${utilisateur != null} ? ${utilisateur.nomPharmacie} : 'Pharmacie'"></span></h2>
 
     <div class="d-flex justify-content-center flex-wrap">
         <a th:href="@{/pharmacie/dons/historique}" class="btn btn-custom"><i class="fas fa-history me-2"></i> Mes Historique</a>

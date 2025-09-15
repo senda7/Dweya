@@ -73,6 +73,27 @@
           margin-right: 10px;
           width: 200px;
         }
+
+  .don-text {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 500;
+    background: linear-gradient(90deg, #1e6b77, #74ebd5, #ACB6E5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: fadeIn 2s ease-in-out, gradientMove 5s infinite alternate;
+    margin-bottom: 25px;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes gradientMove {
+    from { background-position: 0% 50%; }
+    to { background-position: 100% 50%; }
+  }
     </style>
 </head>
 <body>
@@ -85,6 +106,7 @@
             <i class="fas fa-arrow-left me-2"></i> Retour
         </a>
     </div>
+    <p class="don-text">Ici, vous trouverez les demandes de dons des utilisateurs. Chaque utilisateur recevra un code par email pour venir récupérer son don.</p>
 
     <!-- Barre de recherche -->
     <form th:action="@{/demande}" method="get" class="d-flex mb-4 search-bar">

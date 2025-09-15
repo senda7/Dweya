@@ -16,6 +16,7 @@
           --btn-bg: #74ebd5;
           --btn-hover: #5fc9bb;
           --text-color: #333;
+          --main-color: #74ebd5;
         }
 
         * {
@@ -60,37 +61,63 @@
           50% { transform: translateY(-8px); }
         }
 
+        .nav-links {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 15px;
+        }
+
         .nav-links a {
-          margin: 0 12px;
           text-decoration: none;
           color: var(--text-color);
           font-weight: 500;
           transition: color 0.3s;
+          padding: 8px 12px;
         }
 
         .nav-links a:hover {
           color: var(--btn-hover);
         }
 
+        /* NOUVEAU STYLE POUR LE PANIER */
         .cart-icon {
           position: relative;
           margin-right: 20px;
           cursor: pointer;
+          display: flex;
+          align-items: center;
+        }
+
+        .cart-logo {
+          width: 40px;
+          height: 40px;
+          position: relative;
+        }
+
+        .cart-logo svg {
+          width: 100%;
+          height: 100%;
+          fill: var(--primary-color);
         }
 
         .cart-count {
           position: absolute;
-          top: -8px;
-          right: -8px;
+          top: -5px;
+          right: -5px;
           background-color: var(--primary-color);
           color: white;
           border-radius: 50%;
-          width: 20px;
-          height: 20px;
+          width: 22px;
+          height: 22px;
           display: flex;
           justify-content: center;
           align-items: center;
           font-size: 12px;
+          font-weight: bold;
+          border: 2px solid white;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
         .logout-btn {
@@ -297,21 +324,6 @@
           margin-bottom: 10px;
         }
 
-        .stock-low {
-          color: #dc3545;
-          font-weight: bold;
-        }
-
-        .stock-medium {
-          color: #ffc107;
-          font-weight: bold;
-        }
-
-        .stock-high {
-          color: #28a745;
-          font-weight: bold;
-        }
-
         .add-to-cart-btn {
           display: block;
           width: 100%;
@@ -361,27 +373,27 @@
         }
 
         .medicament-image {
-  width: 100%;
-  height: 200px;
-  object-fit: contain;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  background-color: transparent; /* Changement ici */
-  padding: 10px;
-}
+          width: 100%;
+          height: 200px;
+          object-fit: contain;
+          border-radius: 8px;
+          margin-bottom: 10px;
+          background-color: transparent;
+          padding: 10px;
+        }
 
         .medicament-image-placeholder {
-  width: 100%;
-  height: 200px;
-  background-color: transparent; /* Changement ici */
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 10px;
-  color: #6c757d;
-  font-size: 48px;
-}
+          width: 100%;
+          height: 200px;
+          background-color: transparent;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 10px;
+          color: #6c757d;
+          font-size: 48px;
+        }
 
         /* Nouveaux styles pour la gestion du panier */
         .cart-item-controls {
@@ -420,7 +432,6 @@
           border-radius: 4px;
         }
 
-        /* Style amélioré pour le bouton de suppression */
         .remove-btn {
           background: #f8d7da;
           color: #721c24;
@@ -452,7 +463,6 @@
           color: #777;
         }
 
-        /* Style pour les notifications */
         .notification {
           position: fixed;
           bottom: 20px;
@@ -480,7 +490,6 @@
           transform: translateY(0);
         }
 
-        /* Loading state */
         .loading {
           display: inline-block;
           width: 20px;
@@ -504,13 +513,15 @@
 
           .nav-links {
             margin: 15px 0;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
+            flex-direction: column;
           }
 
-          .nav-links a {
-            margin: 5px;
+          .user-name {
+            margin: 10px 0;
+            border-left: none;
+            border-top: 2px solid #eee;
+            padding-top: 10px;
+            text-align: center;
           }
 
           .search-container {
@@ -543,10 +554,10 @@
     </style>
 </head>
 <body>
-<!-- Navbar -->
+<!-- Navbar améliorée -->
 <nav>
     <div class="logo-container">
-        <img th:src="@{/logo.png}" src="https://via.placeholder.com/110x110/74ebd5/1e6b77?text=Dwaya" alt="Logo Dwaya" class="logo">
+        <img th:src="@{/logo.png}" alt="Logo Dwaya" class="logo">
     </div>
 
     <div class="nav-links">
@@ -556,13 +567,18 @@
         <a th:href="@{/espace-dons}">Dons</a>
         <a th:href="@{/pharmacies}">Pharmacies</a>
         <a th:href="@{/profil-utilisateur}">Profil</a>
+
     </div>
 
     <div style="display: flex; align-items: center;">
-        <!-- Icône du panier avec compteur -->
+        <!-- NOUVEAU LOGO PANIER AVEC COMPTEUR -->
         <div class="cart-icon" id="cartIcon">
-            <i class="fas fa-shopping-cart" style="font-size: 24px;"></i>
-            <span class="cart-count" id="cartCount"><i class="fas fa-shopping-cart"></i></span>
+            <div class="cart-logo">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7 22C5.9 22 5 21.1 5 20S5.9 18 7 18 9 18.9 9 20 8.1 22 7 22zM17 22C15.9 22 15 21.1 15 20S15.9 18 17 18 19 18.9 19 20 18.1 22 17 22zM21.1 5.9L17.5 14H7.3L4.3 4H2V2h3.3c.5 0 .9.4 1 .8l.9 2.2h14.2c.4 0 .8.3 1 .7.2.4.1.9-.2 1.2z"/>
+                </svg>
+                <span class="cart-count" id="cartCount">0</span>
+            </div>
         </div>
 
         <form th:action="@{/logout}" method="post">
@@ -607,7 +623,7 @@
         <p class="pharmacy-info"><i class="fas fa-envelope"></i> <span th:text="${pharmacie.email}">Email</span></p>
     </div>
 
-    <h2 class="section-title">Médicaments disponibles </h2>
+    <h2 class="section-title">Médicaments disponibles</h2>
 
     <!-- Search Section -->
     <div class="search-section">
@@ -632,7 +648,7 @@
                 <h3 class="medicament-name" th:text="${medicament.nom}">Nom Médicament</h3>
             </div>
             <div class="medicament-body">
-                <!-- CORRECTION: Affichage correct de l'image avec vérification améliorée -->
+                <!-- Affichage de l'image -->
                 <div th:if="${medicament.photoData != null and medicament.photoData.length() > 0}">
                     <img th:src="'data:image/jpeg;base64,' + ${medicament.photoData}"
                          alt="Image du médicament"
@@ -648,14 +664,6 @@
 
                 <p class="medicament-info">Description: <span th:text="${medicament.description} ?: 'Aucune description disponible'">Description</span></p>
                 <p class="medicament-info">Prix: <span th:text="${#numbers.formatDecimal(medicament.prix, 1, 2)} + ' TND'">Prix</span></p>
-                <p class="medicament-info">
-                    Stock:
-                    <span th:class="${medicament.quantite <= 5} ? 'stock-low' :
-                                      (${medicament.quantite <= 15} ? 'stock-medium' : 'stock-high')"
-                          th:text="${medicament.quantite} + ' unités'">
-                            Quantité
-                        </span>
-                </p>
                 <p class="medicament-info" th:if="${medicament.ordonnanceRequise}">
                     <i class="fas fa-exclamation-triangle"></i> Ordonnance requise
                 </p>
@@ -692,22 +700,6 @@
     }
 
     const pharmacyId = getPharmacyIdFromUrl();
-
-    // Vérifier si nous venons d'une commande réussie
-    function checkOrderSuccess() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const orderSuccess = urlParams.get('orderSuccess');
-
-      if (orderSuccess === 'true') {
-        // Vider le panier après une commande réussie
-        clearCart();
-        showNotification('Commande confirmée avec succès! Votre panier a été vidé.', 'success');
-
-        // Nettoyer l'URL
-        const cleanUrl = window.location.origin + window.location.pathname;
-        window.history.replaceState({}, document.title, cleanUrl);
-      }
-    }
 
     // Initialiser le panier depuis le localStorage
     function initCart() {
@@ -809,15 +801,13 @@
       }
     }
 
-    // Supprimer un article du panier SANS alerte de confirmation
+    // Supprimer un article du panier
     function removeFromCart(id) {
       const item = cart.find(item => item.id == id);
       if (item) {
         cart = cart.filter(item => item.id != id);
         saveCart();
         updateCartUI();
-
-        // Afficher un message de confirmation
         showNotification(`"${item.name}" a été retiré du panier`, 'success');
       }
     }
@@ -831,15 +821,7 @@
 
       // Mettre à jour le compteur
       const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
-
-      // Afficher l'icône de chariot si le panier est vide, sinon le nombre d'articles
-      if (totalItems === 0) {
-        cartCount.innerHTML = '<i class="fas fa-shopping-cart"></i>';
-        if (checkoutBtn) checkoutBtn.disabled = true;
-      } else {
-        cartCount.textContent = totalItems;
-        if (checkoutBtn) checkoutBtn.disabled = false;
-      }
+      cartCount.textContent = totalItems;
 
       // Mettre à jour la liste des articles
       if (cartItems) {
@@ -855,6 +837,7 @@
               <p>Votre panier est vide</p>
             </div>
           `;
+          if (checkoutBtn) checkoutBtn.disabled = true;
         } else {
           cart.forEach(item => {
             const itemTotal = item.price * item.quantity;
@@ -885,6 +868,7 @@
 
             cartItems.appendChild(cartItem);
           });
+          if (checkoutBtn) checkoutBtn.disabled = false;
         }
 
         // Mettre à jour le total
@@ -898,23 +882,19 @@
     document.addEventListener('DOMContentLoaded', function() {
       console.log('Page chargée, pharmacyId:', pharmacyId);
 
-      // Vérifier si nous venons d'une commande réussie
-      checkOrderSuccess();
-
       // Initialiser le panier
       initCart();
 
-      // Boutons "Ajouter au panier"
-      const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
-      addToCartButtons.forEach(button => {
-        button.addEventListener('click', function() {
-          const id = this.getAttribute('data-id');
-          const name = this.getAttribute('data-name');
-          const price = parseFloat(this.getAttribute('data-price'));
-          const maxQuantity = parseInt(this.getAttribute('data-max'));
+      // CORRECTION: Attacher les événements aux boutons "Ajouter au panier"
+      document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('add-to-cart-btn') && !e.target.disabled) {
+          const id = e.target.getAttribute('data-id');
+          const name = e.target.getAttribute('data-name');
+          const price = parseFloat(e.target.getAttribute('data-price'));
+          const maxQuantity = parseInt(e.target.getAttribute('data-max'));
 
           addToCart(id, name, price, maxQuantity);
-        });
+        }
       });
 
       // Ouvrir le panier
@@ -937,7 +917,7 @@
         cartOverlay.addEventListener('click', closeCartPanel);
       }
 
-      // Passer la commande - VERSION CORRIGÉE
+      // Passer la commande
       const checkoutBtn = document.getElementById('checkoutBtn');
       if (checkoutBtn) {
         checkoutBtn.addEventListener('click', function() {
@@ -958,7 +938,7 @@
             queryParams.push(`quantites=${item.quantity}`);
           });
 
-          // Rediriger directement vers la page de commande sans confirmation
+          // Rediriger vers la page de commande
           window.location.href = `/commander-panier?${queryParams.join('&')}`;
         });
       }
