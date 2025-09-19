@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>Accueil-pharmacie</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <!-- Ajout des meta tags CSRF -->
+    <meta name="_csrf" th:content="${_csrf?.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf?.headerName}"/>
     <style>
         :root {
           --main-color: #74ebd5;
@@ -90,11 +93,11 @@
             max-height: 400px;
             overflow-y: auto;
             z-index: 1001;
-            display: none; /* Caché par défaut */
+            display: none;
         }
 
         .notification-dropdown.show {
-            display: block; /* Affiché quand la classe 'show' est ajoutée */
+            display: block;
         }
 
         .notification-item {
@@ -110,6 +113,7 @@
 
         .notification-item.unread {
           background-color: #fff8e6;
+          font-weight: bold;
         }
 
         .notification-message {
@@ -209,9 +213,11 @@
           line-height: 1.6;
         }
 
-        /* Message d'erreur */
-        .error-message {
-            display: none;
+        .no-notifications {
+          padding: 20px;
+          text-align: center;
+          color: #6c757d;
+          font-style: italic;
         }
     </style>
 </head>
@@ -226,11 +232,11 @@
     <!-- Liens de navigation CORRIGÉS -->
     <div class="nav-links">
         <a th:href="@{/accueil-pharmacie}">Accueil</a>
-        <a th:href="@{/pharmacie/{id}/gestion-stock(id=${utilisateur.id})}">Gestion de stock</a>
+        <a th:href="@{/pharmacie/__${utilisateur?.id}__/gestion-stock}">Gestion de stock</a>
         <a th:href="@{/dons-pharmacie}">Gestion des dons</a>
         <a th:href="@{/commande-pharmacie}">Commandes</a>
         <a th:href="@{/profil-pharmacie}">Profil</a>
-        <span class="pharmacy-name" th:text="${utilisateur != null ? utilisateur.nomPharmacie : 'Pharmacie'}">Nom Pharmacie</span>
+        <span class="pharmacy-name" th:text="${utilisateur?.nomPharmacie} ?: 'Pharmacie'">Nom Pharmacie</span>
     </div>
 
     <div class="nav-actions">
@@ -241,19 +247,21 @@
                     <svg viewBox="0 0 24 24">
                         <path d="M12 2C10.34 2 9 3.34 9 5v1.07C6.16 6.56 4 8.92 4 12v5l-1 1v1h18v-1l-1-1v-5c0-3.08-2.16-5.44-5-5.93V5c0-1.66-1.34-3-3-3zM12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2z"/>
                     </svg>
-                    <span th:if="${unreadCount > 0}" class="notification-count" th:text="${unreadCount}">0</span>
+                    <span th:if="${unreadCount != null and unreadCount > 0}" class="notification-count" th:text="${unreadCount}">0</span>
                 </a>
 
                 <!-- Dropdown des notifications -->
                 <div class="notification-dropdown" id="notificationDropdown">
                     <div th:if="${notifications != null and !notifications.isEmpty()}">
-                        <div th:each="notif : ${notifications}" class="notification-item" th:classappend="${notif.read} ? '' : 'unread'" th:onclick="'markAsRead(' + ${notif.id} + ', this)'">
+                        <div th:each="notif : ${notifications}" class="notification-item"
+                             th:classappend="${notif.read} ? '' : 'unread'"
+                             th:onclick="'markAsRead(' + ${notif.id} + ', this)'">
                             <div class="notification-message" th:text="${notif.message}"></div>
                             <div class="notification-time" th:text="${#temporals.format(notif.createdAt, 'dd/MM/yyyy HH:mm')}"></div>
                         </div>
                     </div>
-                    <div th:if="${notifications == null or notifications.isEmpty()}" class="notification-item">
-                        <div class="notification-message">Aucune notification</div>
+                    <div th:if="${notifications == null or notifications.isEmpty()}" class="no-notifications">
+                        Aucune notification
                     </div>
                 </div>
             </div>
@@ -267,7 +275,7 @@
 
 <!-- Hero section -->
 <section class="hero">
-    <h1>Bienvenue,<span th:text="${utilisateur != null ? utilisateur.nomPharmacie : ''}"></span> 👋</h1>
+    <h1>Bienvenue, <span th:text="${utilisateur?.nomPharmacie} ?: 'Pharmacie'"></span> 👋</h1>
     <div class="content">
         <p class="description">
             Gérez vos commandes et votre stock, suivez vos ventes,<br>
@@ -276,12 +284,6 @@
         </p>
     </div>
 </section>
-
-<!-- Message d'erreur caché -->
-<div class="error-message">
-    Gestion des erreurs de variables Thymeleaf document.addEventListener('DOMContentLoaded', function() { // Vérifier si les variables existent const unreadCount =
-    ocument.querySelector('.notification-count'); if (unreadCount && lunreadCount.textContent) { unreadCount.style.display = 'none'; } });
-</div>
 
 <script>
     function toggleNotifications(event) {
@@ -292,18 +294,21 @@
     }
 
     function markAsRead(notificationId, element) {
-        // Mettre à jour visuellement l'élément immédiatement
+        // Mettre à jour visuellement
         element.classList.remove('unread');
 
-        // Envoyer la requête au serveur
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN';
+
+        // CORRECTION : URL d'API correcte
         fetch('/api/notifications/mark-as-read/' + notificationId, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
             }
         }).then(response => {
             if (response.ok) {
-                // Mettre à jour le compteur de notifications non lues
                 const countElement = document.querySelector('.notification-count');
                 if (countElement) {
                     const currentCount = parseInt(countElement.textContent) || 0;
@@ -313,8 +318,9 @@
                         countElement.style.display = 'none';
                     }
                 }
+                // Rafraîchir aussi le compteur via API
+                refreshNotificationCount();
             } else {
-                // En cas d'erreur, remettre le style "unread"
                 element.classList.add('unread');
             }
         }).catch(error => {
@@ -333,14 +339,78 @@
         }
     });
 
-    // Gestion des erreurs de variables Thymeleaf
+    // Initialisation
     document.addEventListener('DOMContentLoaded', function() {
-        // Vérifier si les variables existent
         const unreadCount = document.querySelector('.notification-count');
-        if (unreadCount && (!unreadCount.textContent || unreadCount.textContent === '0')) {
+        if (unreadCount && (unreadCount.textContent === '0' || !unreadCount.textContent)) {
             unreadCount.style.display = 'none';
         }
     });
+
+    // Fonction pour rafraîchir le compteur de notifications (UNE SEULE FOIS)
+    function refreshNotificationCount() {
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN';
+
+        // CORRECTION : URL d'API correcte pour le count
+        fetch('/api/notifications/pharmacie/' + getPharmacieId() + '/count', {
+            headers: {
+                [csrfHeader]: csrfToken
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erreur réseau');
+            }
+            return response.json();
+        })
+        .then(count => {
+            const countElement = document.querySelector('.notification-count');
+            if (count > 0) {
+                if (!countElement) {
+                    const badge = document.querySelector('.notification-badge a');
+                    if (badge) {
+                        const newCountElement = document.createElement('span');
+                        newCountElement.className = 'notification-count';
+                        newCountElement.textContent = count;
+                        badge.appendChild(newCountElement);
+                    }
+                } else {
+                    countElement.textContent = count;
+                    countElement.style.display = 'flex';
+                }
+            } else if (countElement) {
+                countElement.style.display = 'none';
+            }
+        })
+        .catch(error => console.error('Erreur rafraîchissement notifications:', error));
+    }
+
+    // Fonction pour obtenir l'ID de la pharmacie
+    function getPharmacieId() {
+        // Essayez de récupérer l'ID depuis le span pharmacy-name
+        const pharmacyElement = document.querySelector('.pharmacy-name');
+        if (pharmacyElement && pharmacyElement.getAttribute('th:text')) {
+            const text = pharmacyElement.getAttribute('th:text');
+            // Extrait l'ID si stocké dans l'attribut
+            return text;
+        }
+        // Sinon, utilisez une valeur par défaut ou essayez une autre méthode
+        return '1'; // Valeur par défaut, à adapter
+    }
+
+    // Rafraîchir toutes les 30 secondes
+    setInterval(refreshNotificationCount, 30000);
+
+    // Rafraîchir quand la page devient visible
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            refreshNotificationCount();
+        }
+    });
+
+    // Rafraîchir au chargement initial
+    setTimeout(refreshNotificationCount, 1000);
 </script>
 
 </body>

@@ -17,6 +17,7 @@
           --text-color: #333;
           --btn-bg: #74ebd5;
           --btn-hover: #5fc9bb;
+          --alert-color: #ff4757;
         }
 
         * {
@@ -60,6 +61,72 @@
         @keyframes float {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-8px); }
+        }
+
+        /* Styles pour les notifications */
+        .notification-badge {
+          position: relative;
+          display: inline-block;
+        }
+
+        .notification-count {
+          position: absolute;
+          top: -8px;
+          right: -8px;
+          background-color: var(--alert-color);
+          color: white;
+          border-radius: 50%;
+          width: 20px;
+          height: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          font-weight: bold;
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            width: 350px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1001;
+            display: none;
+        }
+
+        .notification-dropdown.show {
+            display: block;
+        }
+
+        .notification-item {
+          padding: 15px;
+          border-bottom: 1px solid #eee;
+          cursor: pointer;
+          transition: background-color 0.3s;
+        }
+
+        .notification-item:hover {
+          background-color: #f8f9fa;
+        }
+
+        .notification-item.unread {
+          background-color: #fff8e6;
+          font-weight: bold;
+        }
+
+        .notification-message {
+          font-size: 14px;
+          margin-bottom: 5px;
+        }
+
+        .notification-time {
+          font-size: 12px;
+          color: #6c757d;
         }
 
         .logout-btn {
@@ -108,20 +175,25 @@
           gap: 15px;
         }
 
+        .icon-links a {
+          display: flex;
+          align-items: center;
+          text-decoration: none;
+          color: var(--text-color);
+        }
+
         .icon-links svg {
-          width:50px;
-          height:50px;
+          width: 24px;
+          height: 24px;
           fill: var(--btn-bg);
           cursor: pointer;
           transition: fill 0.3s;
-          margin:15px;
         }
 
         .icon-links svg:hover {
           fill: var(--btn-hover);
         }
 
-        /* NOUVEAU STYLE POUR LE NOM DE LA PHARMACIE */
         .pharmacy-name {
           font-weight: bold;
           color: var(--main-color);
@@ -269,38 +341,64 @@
             margin: 10px 0 0 0;
             text-align: center;
           }
+
+          .notification-dropdown {
+            width: 300px;
+            right: -50px;
+          }
         }
     </style>
 </head>
 <body>
 
-<!-- Navbar identique à la page d'accueil -->
+<!-- Navbar -->
 <nav>
     <!-- Logo -->
     <div class="logo-container">
         <img th:src="@{/logo.png}" alt="Logo Dwaya" class="logo">
     </div>
 
-    <!-- Liens de navigation - avec valeurs par défaut pour pharmacieId -->
+    <!-- Liens de navigation -->
     <div class="nav-links">
         <a th:href="@{/accueil-pharmacie}">Accueil</a>
-        <a th:href="@{${pharmacieId != null} ? '/pharmacie/' + ${pharmacieId} + '/gestion-stock' : '#'}"
-           th:style="${pharmacieId != null} ? 'color: var(--btn-hover); font-weight: bold;' : ''">Gestion de stock</a>
+        <a th:href="@{/pharmacie/{id}/gestion-stock(id=${utilisateur.id})}">Gestion de stock</a>
         <a th:href="@{/dons-pharmacie}">Gestion des dons</a>
         <a th:href="@{/commande-pharmacie}">Commandes</a>
         <a th:href="@{/profil-pharmacie}">Profil</a>
 
-        <span class="pharmacy-name" th:text="${utilisateur != null ? utilisateur.nomPharmacie : 'Pharmacie'}">Nom Pharmacie</span>
+        <!-- CORRECTION : Affichage du nom de pharmacie -->
+        <span class="pharmacy-name" th:text="${utilisateur?.nomPharmacie} ?: 'Pharmacie'">Nom Pharmacie</span>
     </div>
 
-    <!-- Icônes SVG + Déconnexion -->
     <div class="nav-actions">
         <div class="icon-links">
-            <!-- Icône de notification supprimée comme demandé -->
+            <!-- Notification avec badge -->
+            <div class="notification-badge">
+                <a href="#" onclick="toggleNotifications(event)" title="Notifications">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2C10.34 2 9 3.34 9 5v1.07C6.16 6.56 4 8.92 4 12v5l-1 1v1h18v-1l-1-1v-5c0-3.08-2.16-5.44-5-5.93V5c0-1.66-1.34-3-3-3zM12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2z"/>
+                    </svg>
+                    <!-- Badge de notification -->
+                    <span th:if="${unreadCount != null and unreadCount > 0}" class="notification-count" th:text="${unreadCount}">0</span>
+                </a>
+
+                <!-- Dropdown des notifications -->
+                <div class="notification-dropdown" id="notificationDropdown">
+                    <div th:if="${notifications != null and !notifications.isEmpty()}">
+                        <div th:each="notif : ${notifications}" class="notification-item"
+                             th:classappend="${notif.read} ? '' : 'unread'">
+                            <div class="notification-message" th:text="${notif.message}"></div>
+                            <div class="notification-time" th:text="${#temporals.format(notif.createdAt, 'dd/MM/yyyy HH:mm')}"></div>
+                        </div>
+                    </div>
+                    <div th:if="${notifications == null or notifications.isEmpty()}" class="notification-item">
+                        <div class="notification-message">Aucune notification</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <form th:action="@{/logout}" method="post">
-            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
             <button type="submit" class="logout-btn">Déconnexion</button>
         </form>
     </div>
@@ -309,12 +407,11 @@
 <!-- Contenu principal -->
 <div class="main-content">
     <div class="container">
-        <h1>Gestion de stock - <span th:text="${utilisateur != null} ? ${utilisateur.nomPharmacie} : 'Pharmacie'"></span></h1>
+        <!-- CORRECTION : Titre avec nom de pharmacie -->
+        <h1>Gestion de stock - <span th:text="${utilisateur?.nomPharmacie} ?: 'Pharmacie'"></span></h1>
 
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <!-- LIEN avec vérification de pharmacieId -->
-            <a th:href="@{${pharmacieId != null} ? '/pharmacie/' + ${pharmacieId} + '/gestion-stock/ajouter' : '#'}"
-               class="btn btn-add" th:classappend="${pharmacieId == null} ? 'disabled' : ''">
+            <a th:href="@{/pharmacie/{id}/gestion-stock/ajouter(id=${utilisateur.id})}" class="btn btn-add">
                 <i class="fas fa-plus me-2"></i>Ajouter un médicament
             </a>
             <div>Total : <span th:text="${medicaments != null} ? ${medicaments.size()} : 0">0</span> médicaments</div>
@@ -351,10 +448,10 @@
                     <td th:text="${medicament.prix != null} ? ${#numbers.formatDecimal(medicament.prix,1,2)} + ' dt' : 'N/A'"></td>
                     <td th:text="${medicament.quantite}" th:classappend="${medicament.quantite != null and medicament.quantite < 10} ? 'low-stock' : ''"></td>
 
-                    <!-- NOUVEAU: Date de péremption -->
+                    <!-- Date de péremption -->
                     <td>
                         <span th:if="${medicament.datePeremption != null}"
-                              th:text="${#temporals.format(medicament.datePeremption, 'dd/MM/yyyy')}">
+                              th:text="${medicament.datePeremption}">
                         </span>
                         <span th:if="${medicament.datePeremption == null}">-</span>
                     </td>
@@ -366,12 +463,11 @@
                     </td>
                     <td>
                         <!-- LIENS avec vérification de pharmacieId -->
-                        <a th:href="@{${pharmacieId != null} ? '/pharmacie/' + ${pharmacieId} + '/gestion-stock/modifier/' + ${medicament.id} : '#'}"
-                           class="btn btn-success btn-sm" th:classappend="${pharmacieId == null} ? 'disabled' : ''">Modifier</a>
+                        <a th:href="@{/pharmacie/{id}/gestion-stock/modifier/{medId}(id=${utilisateur.id}, medId=${medicament.id})}"
+                           class="btn btn-success btn-sm">Modifier</a>
                         <a href="#" class="btn btn-danger btn-sm delete-btn"
-                           th:attr="data-url=${pharmacieId != null} ? '/pharmacie/' + ${pharmacieId} + '/gestion-stock/supprimer/' + ${medicament.id} : '#'"
-                           th:data-nom="${medicament.nom}"
-                           th:classappend="${pharmacieId == null} ? 'disabled' : ''">Supprimer</a>
+                           th:attr="data-url=${'/pharmacie/' + utilisateur.id + '/gestion-stock/supprimer/' + medicament.id}"
+                           th:data-nom="${medicament.nom}">Supprimer</a>
                     </td>
                 </tr>
                 <tr th:if="${medicaments == null or medicaments.empty}">
@@ -384,6 +480,24 @@
 </div>
 
 <script>
+    // Fonction pour basculer l'affichage des notifications
+    function toggleNotifications(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        const dropdown = document.getElementById('notificationDropdown');
+        dropdown.classList.toggle('show');
+    }
+
+    // Fermer le dropdown si on clique ailleurs
+    document.addEventListener('click', function(event) {
+        const dropdown = document.getElementById('notificationDropdown');
+        const notificationBadge = document.querySelector('.notification-badge');
+
+        if (dropdown && notificationBadge && !notificationBadge.contains(event.target)) {
+            dropdown.classList.remove('show');
+        }
+    });
+
     // Recherche simplifiée en JavaScript
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
@@ -408,12 +522,6 @@
     // Confirmation de suppression
     document.querySelectorAll('.delete-btn').forEach(btn => {
         btn.addEventListener('click', function(e){
-            // Empêcher l'action si le bouton est désactivé
-            if (this.classList.contains('disabled')) {
-                e.preventDefault();
-                return;
-            }
-
             e.preventDefault();
             const url = this.dataset.url;
             const nom = this.dataset.nom;

@@ -13,6 +13,10 @@ public class Don {
     @ManyToOne
     @JoinColumn(name = "medicament_id")
     private Medicament medicament;
+    @ManyToOne
+    @JoinColumn(name = "utilisateur_id")
+    private Utilisateur utilisateur;
+
 
     // Image du médicament donné
     @Lob
@@ -53,4 +57,6 @@ public class Don {
 
     public String getCodeDemande() { return codeDemande; }
     public void setCodeDemande(String codeDemande) { this.codeDemande = codeDemande; }
+    public Utilisateur getUtilisateur() { return utilisateur; }
+    public void setUtilisateur(Utilisateur utilisateur) { this.utilisateur = utilisateur; }
 }

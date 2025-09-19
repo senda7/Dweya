@@ -11,19 +11,19 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "pharmacie_id", nullable = false)
     private Long pharmacieId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 500)
     private String message;
 
-    @Column(nullable = false)
-    private String type; // STOCK_ALERT, ORDER_ALERT, etc.
+    @Column(nullable = false, length = 50)
+    private String type;
 
-    @Column(nullable = false)
+    @Column(name = "is_read", nullable = false)
     private boolean isRead = false;
 
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     // Getters et Setters
@@ -39,8 +39,13 @@ public class Notification {
     public String getType() { return type; }
     public void setType(String type) { this.type = type; }
 
-    public boolean isRead() { return isRead; }
-    public void setRead(boolean read) { isRead = read; }
+    public boolean isRead() {
+        return isRead;
+    }
+
+    public void setRead(boolean isRead) {
+        this.isRead = isRead;
+    }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

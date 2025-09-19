@@ -11,14 +11,14 @@ import java.util.List;
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
+    List<Notification> findByPharmacieIdOrderByCreatedAtDesc(Long pharmacieId);
     List<Notification> findByPharmacieIdAndIsReadFalseOrderByCreatedAtDesc(Long pharmacieId);
-
-    List<Notification> findByPharmacieIdAndIsReadFalse(Long pharmacieId);
-
     int countByPharmacieIdAndIsReadFalse(Long pharmacieId);
 
-    @Query("SELECT CASE WHEN COUNT(n) > 0 THEN true ELSE false END FROM Notification n WHERE n.message LIKE %:messagePart% AND n.pharmacieId = :pharmacieId AND n.isRead = false")
-    boolean existsByMessageContainingAndPharmacieIdAndIsReadFalse(@Param("messagePart") String messagePart, @Param("pharmacieId") Long pharmacieId);
-
-    List<Notification> findByPharmacieIdOrderByCreatedAtDesc(Long pharmacieId);
+    @Query("SELECT CASE WHEN COUNT(n) > 0 THEN true ELSE false END " +
+            "FROM Notification n " +
+            "WHERE n.pharmacieId = :pharmacieId AND n.type = 'STOCK_ALERT' " +
+            "AND n.message = :message AND n.isRead = false")
+    boolean existsUnreadStockAlert(@Param("pharmacieId") Long pharmacieId,
+                                   @Param("message") String message);
 }

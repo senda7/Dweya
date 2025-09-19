@@ -15,32 +15,29 @@ public class NotificationService {
     @Autowired
     private NotificationRepository notificationRepository;
 
+    // Crée une alerte stock si nécessaire
     public boolean createStockAlert(Medpharmacie medicament, Long pharmacieId) {
         try {
-            // Vérifier si le médicament est vraiment en rupture
-            if (medicament.getQuantite() > 0) {
-                return false;
+            if (medicament.getQuantite() == null || medicament.getQuantite() > 0) {
+                return false; // pas en rupture
             }
 
             String message = "⚠️ Rupture de stock: " + medicament.getNom() + " est épuisé.";
 
-            boolean notificationExists = notificationRepository
-                    .existsByMessageContainingAndPharmacieIdAndIsReadFalse(
-                            medicament.getNom(), // Plus spécifique
-                            pharmacieId
-                    );
+            boolean exists = notificationRepository.existsUnreadStockAlert(pharmacieId, message);
 
-            if (!notificationExists) {
-                Notification notification = new Notification();
-                notification.setPharmacieId(pharmacieId);
-                notification.setMessage(message);
-                notification.setType("STOCK_ALERT");
-                notification.setRead(false);
-                notification.setCreatedAt(LocalDateTime.now());
-                notificationRepository.save(notification);
+            if (!exists) {
+                Notification notif = new Notification();
+                notif.setPharmacieId(pharmacieId);
+                notif.setMessage(message);
+                notif.setType("STOCK_ALERT");
+                notif.setRead(false);
+                notif.setCreatedAt(LocalDateTime.now());
+                notificationRepository.save(notif);
                 return true;
             }
             return false;
+
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -64,5 +61,13 @@ public class NotificationService {
 
     public List<Notification> getAllNotifications(Long pharmacieId) {
         return notificationRepository.findByPharmacieIdOrderByCreatedAtDesc(pharmacieId);
+    }
+
+    public void checkAllMedicamentsForStockAlerts(List<Medpharmacie> medicaments, Long pharmacieId) {
+        for (Medpharmacie med : medicaments) {
+            if (med.getQuantite() != null && med.getQuantite() == 0) {
+                createStockAlert(med, pharmacieId);
+            }
+        }
     }
 }
