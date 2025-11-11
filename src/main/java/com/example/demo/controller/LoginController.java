@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.model.Medpharmacie;
 import com.example.demo.model.Notification;
 import com.example.demo.model.Role;
 import com.example.demo.model.Utilisateur;
@@ -331,26 +332,41 @@ public class LoginController {
         } else return "redirect:/login";
     }
 
+    // ===== ACCUEIL PHARMACIE =====
     @GetMapping("/accueil-pharmacie")
     public String accueilPharmacie(Model model, HttpSession session) {
-        Utilisateur pharmacie = getUtilisateurSession(session);
-        if (pharmacie != null) {
-            model.addAttribute("utilisateur", pharmacie);
+        Long userId = (Long) session.getAttribute("userId");
+        System.out.println("🔍 User ID from session: " + userId);
 
-            List<Notification> notifications = new ArrayList<>();
-            int unreadCount = 0;
-            try {
-                notifications = notificationService.getAllNotifications(pharmacie.getId());
-                unreadCount = notificationService.getUnreadCount(pharmacie.getId());
-            } catch (Exception e) {
-                System.out.println("Erreur notifications: " + e.getMessage());
-            }
+        if (userId == null) {
+            return "redirect:/login";
+        }
 
-            model.addAttribute("notifications", notifications);
-            model.addAttribute("unreadCount", unreadCount);
+        Utilisateur utilisateur = utilisateurRepository.findById(userId).orElse(null);
+        if (utilisateur == null) {
+            System.out.println("❌ Utilisateur non trouvé en base");
+            return "redirect:/login";
+        }
 
-            return "pharmacie/accueil-pharmacie";
-        } else return "redirect:/login";
+        // ✅ Vérifiez que c'est bien une pharmacie
+        if (utilisateur.getTypeUtilisateur() != Utilisateur.TypeUtilisateur.PHARMACIE) {
+            System.out.println("❌ L'utilisateur n'est pas une pharmacie: " + utilisateur.getTypeUtilisateur());
+            return "redirect:/login";
+        }
+
+        System.out.println("✅ Utilisateur est une pharmacie: " + utilisateur.getNomPharmacie());
+        model.addAttribute("utilisateur", utilisateur);
+
+        List<Notification> notifications = notificationService.getAllNotifications(userId);
+        int unreadCount = notificationService.getUnreadCount(userId);
+
+        System.out.println("📊 Notifications trouvées: " + notifications.size());
+        System.out.println("📈 Notifications non lues: " + unreadCount);
+
+        model.addAttribute("notifications", notifications);
+        model.addAttribute("unreadCount", unreadCount);
+
+        return "pharmacie/accueil-pharmacie";
     }
 
     // ===== MÉTHODE UTILE =====
@@ -358,5 +374,24 @@ public class LoginController {
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) return null;
         return utilisateurRepository.findById(userId).orElse(null);
+    }
+    // 📌 TEST: Créer une notification manuellement
+    @GetMapping("/test-notification")
+    @ResponseBody
+    public String testNotification(HttpSession session) {
+        try {
+            Long userId = (Long) session.getAttribute("userId");
+            if (userId == null) return "Non connecté";
+
+            // Créer un médicament fictif en rupture
+            Medpharmacie testMed = new Medpharmacie();
+            testMed.setNom("TEST_MEDICAMENT");
+            testMed.setQuantite(0);
+
+            boolean result = notificationService.createStockAlert(testMed, userId);
+            return "Test notification - Résultat: " + result;
+        } catch (Exception e) {
+            return "Erreur: " + e.getMessage();
+        }
     }
 }

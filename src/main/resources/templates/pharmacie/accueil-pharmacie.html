@@ -7,6 +7,8 @@
     <!-- Ajout des meta tags CSRF -->
     <meta name="_csrf" th:content="${_csrf?.token}"/>
     <meta name="_csrf_header" th:content="${_csrf?.headerName}"/>
+    <!-- Stockage de l'ID pharmacie pour JavaScript -->
+    <meta name="pharmacie-id" th:content="${utilisateur?.id}"/>
     <style>
         :root {
           --main-color: #74ebd5;
@@ -229,7 +231,7 @@
         <img th:src="@{/logo.png}" alt="Logo Dwaya" class="logo">
     </div>
 
-    <!-- Liens de navigation CORRIGÉS -->
+    <!-- Liens de navigation -->
     <div class="nav-links">
         <a th:href="@{/accueil-pharmacie}">Accueil</a>
         <a th:href="@{/pharmacie/__${utilisateur?.id}__/gestion-stock}">Gestion de stock</a>
@@ -247,20 +249,25 @@
                     <svg viewBox="0 0 24 24">
                         <path d="M12 2C10.34 2 9 3.34 9 5v1.07C6.16 6.56 4 8.92 4 12v5l-1 1v1h18v-1l-1-1v-5c0-3.08-2.16-5.44-5-5.93V5c0-1.66-1.34-3-3-3zM12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2z"/>
                     </svg>
-                    <span th:if="${unreadCount != null and unreadCount > 0}" class="notification-count" th:text="${unreadCount}">0</span>
+                    <span th:if="${unreadCount != null and unreadCount > 0}"
+                          class="notification-count"
+                          th:text="${unreadCount}">0</span>
                 </a>
 
                 <!-- Dropdown des notifications -->
                 <div class="notification-dropdown" id="notificationDropdown">
                     <div th:if="${notifications != null and !notifications.isEmpty()}">
-                        <div th:each="notif : ${notifications}" class="notification-item"
-                             th:classappend="${notif.read} ? '' : 'unread'"
+                        <div th:each="notif : ${notifications}"
+                             class="notification-item"
+                             th:classappend="${!notif.read} ? 'unread' : ''"
                              th:onclick="'markAsRead(' + ${notif.id} + ', this)'">
                             <div class="notification-message" th:text="${notif.message}"></div>
-                            <div class="notification-time" th:text="${#temporals.format(notif.createdAt, 'dd/MM/yyyy HH:mm')}"></div>
+                            <div class="notification-time"
+                                 th:text="${#temporals.format(notif.createdAt, 'dd/MM/yyyy HH:mm')}"></div>
                         </div>
                     </div>
-                    <div th:if="${notifications == null or notifications.isEmpty()}" class="no-notifications">
+                    <div th:if="${notifications == null or notifications.isEmpty()}"
+                         class="no-notifications">
                         Aucune notification
                     </div>
                 </div>
@@ -300,7 +307,7 @@
         const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
         const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN';
 
-        // CORRECTION : URL d'API correcte
+        // URL correcte
         fetch('/api/notifications/mark-as-read/' + notificationId, {
             method: 'POST',
             headers: {
@@ -322,6 +329,7 @@
                 refreshNotificationCount();
             } else {
                 element.classList.add('unread');
+                console.error('Erreur lors du marquage comme lu');
             }
         }).catch(error => {
             console.error('Erreur:', error);
@@ -339,21 +347,25 @@
         }
     });
 
-    // Initialisation
-    document.addEventListener('DOMContentLoaded', function() {
-        const unreadCount = document.querySelector('.notification-count');
-        if (unreadCount && (unreadCount.textContent === '0' || !unreadCount.textContent)) {
-            unreadCount.style.display = 'none';
-        }
-    });
+    // Fonction pour obtenir l'ID de la pharmacie depuis le meta tag
+    function getPharmacieId() {
+        const metaTag = document.querySelector('meta[name="pharmacie-id"]');
+        return metaTag ? metaTag.content : null;
+    }
 
-    // Fonction pour rafraîchir le compteur de notifications (UNE SEULE FOIS)
+    // Fonction pour rafraîchir le compteur de notifications
     function refreshNotificationCount() {
+        const pharmacieId = getPharmacieId();
+        if (!pharmacieId) {
+            console.error('ID de pharmacie non trouvé');
+            return;
+        }
+
         const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
         const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN';
 
-        // CORRECTION : URL d'API correcte pour le count
-        fetch('/api/notifications/pharmacie/' + getPharmacieId() + '/count', {
+        // URL correcte selon votre NotificationController
+        fetch('/api/notifications/pharmacie/' + pharmacieId + '/count', {
             headers: {
                 [csrfHeader]: csrfToken
             }
@@ -365,6 +377,7 @@
             return response.json();
         })
         .then(count => {
+            console.log('Nombre de notifications non lues:', count);
             const countElement = document.querySelector('.notification-count');
             if (count > 0) {
                 if (!countElement) {
@@ -386,18 +399,16 @@
         .catch(error => console.error('Erreur rafraîchissement notifications:', error));
     }
 
-    // Fonction pour obtenir l'ID de la pharmacie
-    function getPharmacieId() {
-        // Essayez de récupérer l'ID depuis le span pharmacy-name
-        const pharmacyElement = document.querySelector('.pharmacy-name');
-        if (pharmacyElement && pharmacyElement.getAttribute('th:text')) {
-            const text = pharmacyElement.getAttribute('th:text');
-            // Extrait l'ID si stocké dans l'attribut
-            return text;
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', function() {
+        const unreadCount = document.querySelector('.notification-count');
+        if (unreadCount && (unreadCount.textContent === '0' || !unreadCount.textContent)) {
+            unreadCount.style.display = 'none';
         }
-        // Sinon, utilisez une valeur par défaut ou essayez une autre méthode
-        return '1'; // Valeur par défaut, à adapter
-    }
+
+        // Rafraîchir immédiatement au chargement
+        refreshNotificationCount();
+    });
 
     // Rafraîchir toutes les 30 secondes
     setInterval(refreshNotificationCount, 30000);
@@ -408,9 +419,6 @@
             refreshNotificationCount();
         }
     });
-
-    // Rafraîchir au chargement initial
-    setTimeout(refreshNotificationCount, 1000);
 </script>
 
 </body>
