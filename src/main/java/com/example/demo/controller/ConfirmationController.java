@@ -33,7 +33,7 @@ public class ConfirmationController {
 
             // Charger la commande avec les médicaments - Utilisez une jointure FETCH
             Optional<Commande> commandeOpt = commandeRepository.findByIdWithMedicaments(commandeId);
-            if (commandeOpt.isEmpty()) {
+            if (!commandeOpt.isPresent()) {
                 model.addAttribute("error", "Commande non trouvée");
                 return "error";
             }

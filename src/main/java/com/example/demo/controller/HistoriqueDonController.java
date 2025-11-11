@@ -35,8 +35,6 @@ public class HistoriqueDonController {
     public String afficherHistoriqueDonsUtilisateur(HttpSession session, Model model) {
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) return "redirect:/login";
-
-        // Récupère uniquement les dons de l'utilisateur connectée et qui sont ACCEPTES ou REFUSES
         List<Don> donsHistoriques = donRepository.findByMedicament_Utilisateur_IdAndStatutIn(
                 userId, List.of(StatutDon.ACCEPTE, StatutDon.REFUSE)
         );

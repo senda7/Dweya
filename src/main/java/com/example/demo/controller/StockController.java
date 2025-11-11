@@ -25,32 +25,30 @@ public class StockController {
     @Autowired
     private NotificationService notificationService;
 
-    // Page principale de gestion du stock
+    // 📌 Afficher la gestion du stock
     @GetMapping
     public String gestionStock(@PathVariable Long pharmacieId, Model model) {
         try {
-            // Récupérer tous les médicaments de la pharmacie spécifique
             List<Medpharmacie> medicaments = medpharmacieRepository.findByPharmacieId(pharmacieId);
             model.addAttribute("medicaments", medicaments);
             model.addAttribute("pharmacieId", pharmacieId);
 
-            // Vérifier les stocks épuisés
             List<Medpharmacie> stocksEpuises = medicaments.stream()
                     .filter(med -> med.getQuantite() != null && med.getQuantite() == 0)
                     .toList();
 
-            // Créer des notifications
+            System.out.println("📊 Stocks épuisés trouvés: " + stocksEpuises.size());
             for (Medpharmacie med : stocksEpuises) {
-                notificationService.createStockAlert(med, pharmacieId);
+                System.out.println("➡️ Vérification: " + med.getNom() + " (qte: " + med.getQuantite() + ")");
+                boolean result = notificationService.createStockAlert(med, pharmacieId);
+                System.out.println("📝 Résultat alerte: " + result);
             }
 
-            // Récupérer les notifications
             List<Notification> notifications = notificationService.getUnreadNotifications(pharmacieId);
             model.addAttribute("notifications", notifications);
             model.addAttribute("unreadCount", notifications != null ? notifications.size() : 0);
 
             return "pharmacie/gestion-stock";
-
         } catch (Exception e) {
             e.printStackTrace();
             model.addAttribute("error", "Erreur lors du chargement du stock: " + e.getMessage());
@@ -58,15 +56,15 @@ public class StockController {
         }
     }
 
-    // Afficher le formulaire d'ajout - CORRIGÉ
+    // 📌 Formulaire ajout
     @GetMapping("/ajouter")
     public String showAjouterForm(@PathVariable Long pharmacieId, Model model) {
         model.addAttribute("medicament", new Medpharmacie());
         model.addAttribute("pharmacieId", pharmacieId);
-        return "pharmacie/ajouter"; // ← CORRECTION ICI
+        return "pharmacie/ajouter";
     }
 
-    // Ajouter un nouveau médicament
+    // 📌 Ajouter médicament
     @PostMapping("/ajouter")
     public String ajouterMedicament(
             @PathVariable Long pharmacieId,
@@ -77,11 +75,8 @@ public class StockController {
             @RequestParam(required = false) Boolean ordonnanceRequise,
             @RequestParam(required = false) MultipartFile photo,
             Model model) {
-
         try {
-            if (ordonnanceRequise == null) {
-                ordonnanceRequise = false;
-            }
+            if (ordonnanceRequise == null) ordonnanceRequise = false;
 
             Medpharmacie medicament = new Medpharmacie();
             medicament.setNom(nom);
@@ -91,21 +86,21 @@ public class StockController {
             medicament.setOrdonnanceRequise(ordonnanceRequise);
             medicament.setPharmacieId(pharmacieId);
 
-            // Gestion de la photo
             if (photo != null && !photo.isEmpty()) {
                 String photoData = Base64.getEncoder().encodeToString(photo.getBytes());
                 medicament.setPhotoData(photoData);
             }
 
             medpharmacieRepository.save(medicament);
+            System.out.println("💊 Médicament ajouté: " + nom + " (qte: " + quantite + ")");
 
-            // Vérifier si le stock est épuisé
             if (quantite == 0) {
-                notificationService.createStockAlert(medicament, pharmacieId);
+                System.out.println("⚠️ Tentative création alerte pour nouveau médicament en rupture");
+                boolean result = notificationService.createStockAlert(medicament, pharmacieId);
+                System.out.println("📝 Résultat alerte: " + result);
             }
 
             return "redirect:/pharmacie/" + pharmacieId + "/gestion-stock?success=Médicament ajouté avec succès";
-
         } catch (IOException e) {
             e.printStackTrace();
             model.addAttribute("error", "Erreur lors du traitement de l'image: " + e.getMessage());
@@ -117,7 +112,7 @@ public class StockController {
         }
     }
 
-    // Afficher le formulaire de modification - CORRIGÉ
+    // 📌 Formulaire modification
     @GetMapping("/modifier/{medicamentId}")
     public String showModifierForm(@PathVariable Long pharmacieId, @PathVariable Long medicamentId, Model model) {
         try {
@@ -126,11 +121,9 @@ public class StockController {
                 model.addAttribute("error", "Médicament non trouvé");
                 return "error";
             }
-
             model.addAttribute("medicament", medicamentOpt.get());
             model.addAttribute("pharmacieId", pharmacieId);
-            return "pharmacie/modifier"; // ← CORRECTION ICI
-
+            return "pharmacie/modifier";
         } catch (Exception e) {
             e.printStackTrace();
             model.addAttribute("error", "Erreur lors du chargement du médicament: " + e.getMessage());
@@ -138,7 +131,7 @@ public class StockController {
         }
     }
 
-    // Modifier un médicament existant
+    // 📌 Modifier médicament
     @PostMapping("/modifier/{medicamentId}")
     public String modifierMedicament(
             @PathVariable Long pharmacieId,
@@ -150,11 +143,8 @@ public class StockController {
             @RequestParam(required = false) Boolean ordonnanceRequise,
             @RequestParam(required = false) MultipartFile photo,
             Model model) {
-
         try {
-            if (ordonnanceRequise == null) {
-                ordonnanceRequise = false;
-            }
+            if (ordonnanceRequise == null) ordonnanceRequise = false;
 
             Optional<Medpharmacie> medicamentOpt = medpharmacieRepository.findByIdAndPharmacieId(medicamentId, pharmacieId);
             if (medicamentOpt.isEmpty()) {
@@ -163,8 +153,6 @@ public class StockController {
             }
 
             Medpharmacie medicament = medicamentOpt.get();
-
-            // Sauvegarder l'ancienne quantité
             Integer ancienneQuantite = medicament.getQuantite();
 
             medicament.setNom(nom);
@@ -173,21 +161,21 @@ public class StockController {
             medicament.setQuantite(quantite);
             medicament.setOrdonnanceRequise(ordonnanceRequise);
 
-            // Gestion de la photo
             if (photo != null && !photo.isEmpty()) {
                 String photoData = Base64.getEncoder().encodeToString(photo.getBytes());
                 medicament.setPhotoData(photoData);
             }
 
             medpharmacieRepository.save(medicament);
+            System.out.println("✏️ Médicament modifié: " + nom + " (ancienne qte: " + ancienneQuantite + ", nouvelle qte: " + quantite + ")");
 
-            // Vérifier les alertes de stock
             if (ancienneQuantite != null && ancienneQuantite > 0 && quantite == 0) {
-                notificationService.createStockAlert(medicament, pharmacieId);
+                System.out.println("⚠️ Tentative création alerte pour médicament maintenant en rupture");
+                boolean result = notificationService.createStockAlert(medicament, pharmacieId);
+                System.out.println("📝 Résultat alerte: " + result);
             }
 
             return "redirect:/pharmacie/" + pharmacieId + "/gestion-stock?success=Médicament modifié avec succès";
-
         } catch (IOException e) {
             e.printStackTrace();
             model.addAttribute("error", "Erreur lors du traitement de l'image: " + e.getMessage());
@@ -199,7 +187,7 @@ public class StockController {
         }
     }
 
-    // Supprimer un médicament
+    // 📌 Supprimer médicament
     @PostMapping("/supprimer/{medicamentId}")
     public String supprimerMedicament(@PathVariable Long pharmacieId, @PathVariable Long medicamentId, Model model) {
         try {
@@ -207,10 +195,8 @@ public class StockController {
                 model.addAttribute("error", "Médicament non trouvé");
                 return "error";
             }
-
             medpharmacieRepository.deleteById(medicamentId);
             return "redirect:/pharmacie/" + pharmacieId + "/gestion-stock?success=Médicament supprimé avec succès";
-
         } catch (Exception e) {
             e.printStackTrace();
             model.addAttribute("error", "Erreur lors de la suppression du médicament: " + e.getMessage());
@@ -218,7 +204,7 @@ public class StockController {
         }
     }
 
-    // Vérifier les stocks épuisés
+    // 📌 Vérifier les stocks
     @GetMapping("/verifier-stocks")
     public String verifierStocks(@PathVariable Long pharmacieId, Model model) {
         try {
@@ -227,16 +213,20 @@ public class StockController {
                     .filter(med -> med.getQuantite() != null && med.getQuantite() == 0)
                     .toList();
 
+            System.out.println("🔍 Vérification stocks - Épuisés: " + stocksEpuises.size());
             int alertesCrees = 0;
             for (Medpharmacie med : stocksEpuises) {
+                System.out.println("➡️ Vérification stock: " + med.getNom() + " (qte: " + med.getQuantite() + ")");
                 boolean alerteCreee = notificationService.createStockAlert(med, pharmacieId);
                 if (alerteCreee) {
                     alertesCrees++;
+                    System.out.println("✅ Alerte créée: " + med.getNom());
+                } else {
+                    System.out.println("❌ Alerte non créée: " + med.getNom());
                 }
             }
 
-            return "redirect:/pharmacie/" + pharmacieId + "/gestion-stock?info=" + alertesCrees + " alerte(s) de stock créée(s)";
-
+            return "redirect:/pharmacie/" + pharmacieId + "/gestion-stock?info=" + alertesCrees + " alerte(s) créée(s)";
         } catch (Exception e) {
             e.printStackTrace();
             model.addAttribute("error", "Erreur lors de la vérification des stocks: " + e.getMessage());
@@ -244,7 +234,7 @@ public class StockController {
         }
     }
 
-    // Rechercher des médicaments
+    // 📌 Recherche
     @GetMapping("/rechercher")
     public String rechercherMedicaments(@PathVariable Long pharmacieId, @RequestParam String nom, Model model) {
         try {
@@ -252,9 +242,7 @@ public class StockController {
             model.addAttribute("medicaments", medicaments);
             model.addAttribute("termerecherche", nom);
             model.addAttribute("pharmacieId", pharmacieId);
-
             return "pharmacie/gestion-stock";
-
         } catch (Exception e) {
             e.printStackTrace();
             model.addAttribute("error", "Erreur lors de la recherche: " + e.getMessage());
@@ -262,7 +250,7 @@ public class StockController {
         }
     }
 
-    // API pour obtenir le nombre de notifications non lues
+    // 📌 API count notifs
     @GetMapping("/api/notifications/count")
     @ResponseBody
     public int getNotificationCount(@PathVariable Long pharmacieId) {
@@ -272,19 +260,4 @@ public class StockController {
             e.printStackTrace();
             return 0;
         }
-    }
-
-    // TEST METHOD - Pour vérifier que le contrôleur fonctionne (CORRIGÉ)
-    @GetMapping("/test")
-    @ResponseBody
-    public String test(@PathVariable Long pharmacieId) {
-        return "✅ StockController est fonctionnel pour la pharmacie ID: " + pharmacieId;
-    }
-
-    // Page d'accueil pour choisir une pharmacie (optionnel)
-    @GetMapping("/accueil")
-    public String accueil(Model model) {
-        // Vous pouvez ajouter une liste des pharmacies disponibles si nécessaire
-        return "pharmacie/accueil";
-    }
-}
+    }}

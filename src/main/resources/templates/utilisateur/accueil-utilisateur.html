@@ -15,243 +15,108 @@
           --user-color: #1e6b77;
         }
 
-        * {
-          box-sizing: border-box;
-          margin: 0;
-          padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Roboto', sans-serif; background-color: #ffffff; color: var(--text-color); min-height: 100vh; }
 
-        body {
-          font-family: 'Roboto', sans-serif;
-          background-color: #ffffff;
-          color: var(--text-color);
-          min-height: 100vh;
-        }
-
-        /* Navbar fixe */
         nav {
-          position: sticky;
-          top: 0;
-          z-index: 1000;
-          background-color: #fff;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
+          position: sticky; top: 0; z-index: 1000;
+          background-color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+          display: flex; justify-content: space-between; align-items: center;
           padding: 15px 40px;
         }
-
-        .logo-container {
-          display: flex;
-          align-items: center;
-        }
-        .logo {
-          width: 110px;
-          height: 110px;
-          margin-bottom: 10px;
-          animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-8px); }
-        }
+        .logo-container { display: flex; align-items: center; }
+        .logo { width:110px; height:110px; margin-bottom:10px; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);} }
 
         .logout-btn {
-          background-color: transparent;
-          border: 2px solid var(--btn-bg);
-          color: var(--btn-bg);
-          padding: 8px 16px;
-          border-radius: 8px;
-          cursor: pointer;
-          transition: 0.3s;
+          background-color: transparent; border: 2px solid var(--btn-bg); color: var(--btn-bg);
+          padding:8px 16px; border-radius:8px; cursor:pointer; transition:0.3s;
         }
+        .logout-btn:hover { background-color: var(--btn-bg); color:white; }
 
-        .logout-btn:hover {
-          background-color: var(--btn-bg);
-          color: white;
-        }
+        .nav-links { display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:15px; }
+        .nav-links a { text-decoration:none; color: var(--text-color); font-weight:500; transition:0.3s; padding:8px 12px; }
+        .nav-links a:hover { color: var(--btn-hover); }
+        .user-name { font-weight:bold; color: var(--main-color); margin-left:8px; font-size:16px; padding:5px 12px; border-left:2px solid #eee; }
 
-        /* Hero section */
-        .hero {
-          padding: 80px 20px 60px;
-          text-align: center;
-        }
+        .nav-actions { display:flex; align-items:center; gap:20px; position: relative; }
+        .icon-links { display:flex; align-items:center; gap:15px; position:relative; }
+        .icon-links svg { width:24px; height:24px; fill:var(--btn-bg); cursor:pointer; transition:0.3s; }
+        .icon-links svg:hover { fill: var(--btn-hover); }
 
-        .hero h1 {
-          font-size: 40px;
-          margin-bottom: 20px;
-          animation: fadeInDown 1.2s ease;
-        }
-
-        .hero p {
-          font-size: 18px;
-          color: #555;
-          max-width: 700px;
-          margin: auto;
-          animation: fadeInUp 1.5s ease;
-        }
-
-        @keyframes fadeInDown {
-          from { opacity: 0; transform: translateY(-30px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(30px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-
-        .nav-links {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          flex-wrap: wrap;
-          gap: 15px;
-        }
-
-        .nav-links a {
-          text-decoration: none;
-          color: var(--text-color);
-          font-weight: 500;
-          transition: color 0.3s;
-          padding: 8px 12px;
-        }
-
-        .nav-links a:hover {
-          color: var(--btn-hover);
-        }
-
-        .user-name {
-          font-weight: bold;
-          color: var(--main-color);
-          margin-left: 8px;
-          font-size: 16px;
-          padding: 5px 12px;
-          border-left: 2px solid #eee;
-        }
-
-        .nav-actions {
-          display: flex;
-          align-items: center;
-          gap: 20px;
-        }
-
-        .icon-links {
-          display: flex;
-          align-items: center;
-          gap: 15px;
-        }
-
-        .icon-links a {
-          position: relative;
-          display: inline-block;
-        }
-
-        .icon-links svg {
-          width: 24px;
-          height: 24px;
-          fill: var(--btn-bg);
-          cursor: pointer;
-          transition: fill 0.3s;
-        }
-
-        .icon-links svg:hover {
-          fill: var(--btn-hover);
-        }
-
-        /* Styles pour le badge de notification */
         .notification-badge {
-          position: absolute;
-          top: -8px;
-          right: -8px;
-          background-color: #dc3545;
-          color: white;
-          border-radius: 50%;
-          width: 20px;
-          height: 20px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 0.7rem;
-          font-weight: bold;
+          position: absolute; top:-8px; right:-8px;
+          background-color:#dc3545; color:white; border-radius:50%;
+          width:20px; height:20px; display:flex; align-items:center; justify-content:center;
+          font-size:0.7rem; font-weight:bold;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-          nav {
-            flex-direction: column;
-            padding: 15px;
-          }
-
-          .nav-links {
-            margin: 15px 0;
-          }
-
-          .user-name {
-            margin: 10px 0;
-          }
-
-          .icon-links {
-            margin-top: 10px;
-          }
+        #notification-list {
+          display:none; position:absolute; top:35px; right:0; background:white;
+          border:1px solid #ddd; border-radius:8px; width:300px; max-height:400px;
+          overflow-y:auto; z-index:1001; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
-        /* Section fonctionnalités */
-        .features {
-          padding: 60px 20px;
-          background: linear-gradient(135deg, var(--main-color), var(--second-color));
+        #notification-list .notification-header {
+          padding: 12px 16px; background-color: #f8f9fa; border-bottom: 1px solid #eee;
+          font-weight: bold; color: var(--text-color);
         }
 
-        .feature-card {
-          background: white;
-          border-radius: 15px;
-          padding: 30px;
-          text-align: center;
-          box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-          transition: transform 0.3s ease;
-          height: 100%;
+        #notification-list ul {
+          list-style:none; padding:0; margin:0;
         }
 
-        .feature-card:hover {
-          transform: translateY(-5px);
+        #notification-list li {
+          padding:12px 16px; border-bottom:1px solid #f0f0f0; cursor:pointer;
+          transition: background-color 0.2s ease;
+          font-size: 14px; line-height: 1.4;
         }
 
-        .feature-icon {
-          font-size: 3rem;
-          color: var(--main-color);
-          margin-bottom: 20px;
+        #notification-list li:hover {
+          background-color: #f8f9fa;
         }
 
-        /* Section statistiques */
-        .stats {
-          padding: 60px 20px;
-          background: white;
+        #notification-list li.read {
+          opacity: 0.6; background-color: #f9f9f9;
         }
 
-        .stat-item {
-          text-align: center;
-          padding: 20px;
+        .notification-empty {
+          padding: 20px; text-align: center; color: #666; font-style: italic;
         }
 
-        .stat-number {
-          font-size: 2.5rem;
-          font-weight: bold;
-          color: var(--main-color);
-          margin-bottom: 10px;
+        @media(max-width:768px){
+          nav{flex-direction:column; padding:15px;}
+          .nav-links{margin:15px 0;}
+          .user-name{margin:10px 0;}
+          .icon-links{margin-top:10px;}
+          #notification-list { width: 280px; }
         }
+
+        .hero { padding:80px 20px 60px; text-align:center; }
+        .hero h1 { font-size:40px; margin-bottom:20px; animation:fadeInDown 1.2s ease; }
+        .hero p { font-size:18px; color:#555; max-width:700px; margin:auto; animation:fadeInUp 1.5s ease; }
+        @keyframes fadeInDown { from{opacity:0; transform:translateY(-30px);} to{opacity:1; transform:translateY(0);} }
+        @keyframes fadeInUp { from{opacity:0; transform:translateY(30px);} to{opacity:1; transform:translateY(0);} }
+
+        .features { padding:60px 20px; background: linear-gradient(135deg,var(--main-color),var(--second-color)); }
+        .feature-card { background:white; border-radius:15px; padding:30px; text-align:center; box-shadow:0 5px 15px rgba(0,0,0,0.1); transition:0.3s; height:100%; }
+        .feature-card:hover { transform: translateY(-5px); }
+        .feature-icon { font-size:3rem; color: var(--main-color); margin-bottom:20px; }
+
+        .stats { padding:60px 20px; background:white; }
+        .stat-item { text-align:center; padding:20px; }
+        .stat-number { font-size:2.5rem; font-weight:bold; color: var(--main-color); margin-bottom:10px; }
+
     </style>
 </head>
 <body>
 
 <!-- Navbar -->
 <nav>
-    <!-- Logo -->
     <div class="logo-container">
         <img th:src="@{/logo.png}" alt="Logo Dwaya" class="logo">
     </div>
 
-    <!-- Liens de navigation avec nom de l'utilisateur -->
     <div class="nav-links">
         <a th:href="@{/accueil-utilisateur}">Accueil</a>
         <a th:href="@{/medicament}">Médicaments</a>
@@ -259,25 +124,34 @@
         <a th:href="@{/espace-dons}">Dons</a>
         <a th:href="@{/pharmacies}">Pharmacies</a>
         <a th:href="@{/profil-utilisateur}">Profil</a>
-
-        <!-- Nom de l'utilisateur -->
         <span class="user-name" th:text="${utilisateur != null ? utilisateur.prenom + ' ' + utilisateur.nom : 'Utilisateur'}">Prénom Nom</span>
     </div>
 
-    <!-- Icônes SVG + Déconnexion -->
     <div class="nav-actions">
         <div class="icon-links">
-            <!-- Notification avec badge -->
-            <a th:href="@{/notifications}" title="Notifications" class="position-relative">
+            <a href="#" onclick="toggleNotifications(event)" title="Notifications" class="position-relative">
                 <svg viewBox="0 0 24 24">
                     <path d="M12 2C10.34 2 9 3.34 9 5v1.07C6.16 6.56 4 8.92 4 12v5l-1 1v1h18v-1l-1-1v-5c0-3.08-2.16-5.44-5-5.93V5c0-1.66-1.34-3-3-3zM12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2z"/>
                 </svg>
-                <!-- Badge pour notifications non lues -->
-                <span th:if="${unreadCount != null && unreadCount > 0}"
-                      class="notification-badge"
-                      th:text="${unreadCount}">
-                </span>
+                <span th:if="${unreadCount > 0}" class="notification-badge" th:text="${unreadCount}" id="notification-badge"></span>
             </a>
+
+            <div id="notification-list">
+                <div class="notification-header">
+                    Notifications
+                </div>
+                <ul th:if="${notifications != null and !notifications.empty}">
+                    <li th:each="notif : ${notifications}"
+                        th:text="${notif.message}"
+                        th:attr="data-id=${notif.id}"
+                        th:class="${notif.lu} ? 'read' : ''"
+                        onclick="marquerCommeLu(this)">
+                    </li>
+                </ul>
+                <div th:if="${notifications == null or notifications.empty}" class="notification-empty">
+                    Aucune notification pour le moment
+                </div>
+            </div>
         </div>
 
         <form th:action="@{/logout}" method="post">
@@ -299,60 +173,34 @@
 <!-- Section Fonctionnalités -->
 <section class="features">
     <div class="container">
-        <h2 class="text-center mb-5" style="color: white;">Nos Services</h2>
+        <h2 class="text-center mb-5" style="color:white;">Nos Services</h2>
         <div class="row g-4">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="feature-card">
                     <div class="feature-icon">💊</div>
                     <h3>Gestion des Médicaments</h3>
                     <p>Ajoutez, modifiez et suivez vos médicaments facilement avec notre système intuitif.</p>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="feature-card">
                     <div class="feature-icon">⏰</div>
                     <h3>Rappels Intelligents</h3>
                     <p>Ne manquez jamais une prise avec nos rappels personnalisés et notifications.</p>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="feature-card">
                     <div class="feature-icon">🤝</div>
                     <h3>Dons Sécurisés</h3>
                     <p>Donnez vos médicaments non utilisés à ceux qui en ont besoin, en toute sécurité.</p>
                 </div>
             </div>
-        </div>
-    </div>
-</section>
-
-<!-- Section Statistiques -->
-<section class="stats">
-    <div class="container">
-        <h2 class="text-center mb-5">Votre Activité</h2>
-        <div class="row">
             <div class="col-md-3">
-                <div class="stat-item">
-                    <div class="stat-number" th:text="${statistics != null ? statistics.medicamentCount : '0'}">0</div>
-                    <p>Médicaments</p>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-item">
-                    <div class="stat-number" th:text="${statistics != null ? statistics.donCount : '0'}">0</div>
-                    <p>Dons Effectués</p>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-item">
-                    <div class="stat-number" th:text="${unreadCount != null ? unreadCount : '0'}">0</div>
-                    <p>Notifications</p>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-item">
-                    <div class="stat-number" th:text="${statistics != null ? statistics.rappelCount : '0'}">0</div>
-                    <p>Rappels Actifs</p>
+                <div class="feature-card">
+                    <div class="feature-icon">🛒</div>
+                    <h3>Passer une Commande</h3>
+                    <p>Commandez vos médicaments directement auprès de votre pharmacie et suivez votre commande en temps réel.</p>
                 </div>
             </div>
         </div>
@@ -360,13 +208,107 @@
 </section>
 
 <!-- Footer -->
-<footer style="background-color: #f8f9fa; padding: 40px 0; text-align: center;">
+<footer style="background-color:#f8f9fa; padding:40px 0; text-align:center;">
     <div class="container">
-        <p>&copy; 2024 Dwaya. Tous droits réservés.</p>
+        <p>&copy; 2025 Dwaya. Tous droits réservés.</p>
         <p>Prenez soin de votre santé, nous nous occupons du reste.</p>
     </div>
 </footer>
 
+<!-- Scripts JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Afficher / cacher notifications
+    function toggleNotifications(event) {
+        event.preventDefault();
+        const list = document.getElementById('notification-list');
+        const isVisible = list.style.display === 'block';
+
+        // Fermer toutes les autres dropdowns
+        document.querySelectorAll('.dropdown-menu').forEach(menu => {
+            menu.style.display = 'none';
+        });
+
+        // Toggle la liste des notifications
+        list.style.display = isVisible ? 'none' : 'block';
+
+        console.log('Toggle notifications - Display:', list.style.display);
+    }
+
+    // Marquer notification comme lue au clic
+    function marquerCommeLu(element) {
+        const notifId = element.getAttribute("data-id");
+
+        if (!notifId) {
+            console.error('ID de notification manquant');
+            return;
+        }
+
+        console.log('Marquage comme lu - ID:', notifId);
+
+        fetch('/notifications/marquer-lu/' + notifId, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            console.log('Réponse serveur:', response.status);
+            if (response.ok) {
+                // Marquer visuellement comme lu
+                element.classList.add('read');
+                element.style.opacity = '0.6';
+
+                // Mettre à jour le badge
+                const badge = document.getElementById('notification-badge');
+                if (badge) {
+                    let count = parseInt(badge.innerText) || 0;
+                    count = Math.max(0, count - 1);
+
+                    if (count > 0) {
+                        badge.innerText = count;
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+
+                console.log('Notification marquée comme lue avec succès');
+            } else {
+                console.error('Erreur lors du marquage:', response.status);
+            }
+        })
+        .catch(error => {
+            console.error('Erreur réseau:', error);
+        });
+    }
+
+    // Fermer les notifications si on clique ailleurs
+    document.addEventListener('click', function(event) {
+        const notificationList = document.getElementById('notification-list');
+        const notificationIcon = event.target.closest('[onclick*="toggleNotifications"]');
+
+        if (!notificationIcon && !notificationList.contains(event.target)) {
+            notificationList.style.display = 'none';
+        }
+    });
+
+    // Debug: Afficher les informations au chargement
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Page chargée');
+        const notifications = document.querySelectorAll('#notification-list li[data-id]');
+        console.log('Nombre de notifications trouvées:', notifications.length);
+
+        const badge = document.getElementById('notification-badge');
+        console.log('Badge count:', badge ? badge.innerText : 'Aucun badge');
+
+        notifications.forEach((notif, index) => {
+            console.log(`Notification ${index + 1}:`, {
+                id: notif.getAttribute('data-id'),
+                message: notif.textContent.trim(),
+                isRead: notif.classList.contains('read')
+            });
+        });
+    });
+</script>
 </body>
 </html>
